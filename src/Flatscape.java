@@ -1,3 +1,4 @@
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class Flatscape { 
@@ -7,7 +8,8 @@ public class Flatscape {
 	private static double rx  = .48, ry = .86;   // position (character)		
 	private static double vx = 0.015, vy = 0.023;     // velocity (character)
 	
-	public static final double BULLET_SPEED = 0.01;    //The distance the bullet travels, per frame
+	public static final double BULLET_SPEED = 0.0175;    //The distance the bullet travels, per frame
+	public static final int BULLET_DELAY = 15;
 	
 	public static void main(String[] args) {
 
@@ -15,17 +17,18 @@ public class Flatscape {
 		StdDraw.setXscale(-1.0, 1.0);
 		StdDraw.setYscale(-1.0, 1.0);
 		 
-		int delay = 20; int curDelay = 0;//used to put [delay] loops in between each bullet spawning
+		 int curDelay = 0;//used to put [delay] loops in between each bullet spawning
 
 		// main animation loop		
 		while (true)  {
 
+			keyboard();
 			drawCursor();			
 
 			if(curDelay <= 0) {
 				curDelay = 0;
 				if(StdDraw.mousePressed()) {
-					curDelay = delay;
+					curDelay = BULLET_DELAY;
 					addBullet();					
 				}
 			}
@@ -78,12 +81,16 @@ public class Flatscape {
 		if (StdDraw.mouseX() < rx) TriAngle = TriAngle - 180;
 		
 		// updates position, moving character towards mouse
-		if (StdDraw.mouseX() != rx && StdDraw.mouseY() != ry && StdDraw.mousePressed()) {
+		/*if (StdDraw.mouseX() != rx && StdDraw.mouseY() != ry && StdDraw.mousePressed()) {
 			vx = (StdDraw.mouseX() - rx) / 30;
 			vy = (StdDraw.mouseY() - ry) / 30;
-			rx = rx + vx;
-			ry = ry + vy; 
-		}
+			 
+		}*/
+		
+		rx = rx + vx;
+		ry = ry + vy;
+		rx = rx > 1 ? 1 : rx < -1 ? -1 : rx;
+		ry = ry > 1 ? 1 : ry < -1 ? -1 : ry;
 
 		// Target drawn
 		StdDraw.setPenColor(StdDraw.RED);
@@ -92,5 +99,18 @@ public class Flatscape {
 		// draw character on the screen
 		StdDraw.setPenColor(StdDraw.BLUE); 
 		StdDraw.picture(rx, ry, "Triangle.png",.1,.1,TriAngle);
+	}
+	
+	private static void keyboard() {
+		vx = vy = 0;
+		if(StdDraw.isKeyPressed(KeyEvent.VK_W)) {
+			vy += .025;
+		} if(StdDraw.isKeyPressed(KeyEvent.VK_A)) {
+			vx -= .025;
+		} if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
+			vy -= .025;
+		} if(StdDraw.isKeyPressed(KeyEvent.VK_D)) {
+			vx += .025;
+		}
 	}
 } 

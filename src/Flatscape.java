@@ -17,11 +17,10 @@ public class Flatscape {
 		StdDraw.setXscale(-1.0, 1.0);
 		StdDraw.setYscale(-1.0, 1.0);
 		 
-		 int curDelay = 0;//used to put [delay] loops in between each bullet spawning
+		int curDelay = 0;
 
 		// main animation loop		
 		while (true)  {
-
 			keyboard();
 			drawCursor();			
 
@@ -33,8 +32,7 @@ public class Flatscape {
 				}
 			}
 			
-			drawBullets();
-			
+			drawBullets();			
 			curDelay--;
 
 			StdDraw.show(0); 	
@@ -62,7 +60,7 @@ public class Flatscape {
 		for(int i = 0;i < posArray.length; i++) {
 			double[] bPos = posArray[i];
 			double[] bVelocity = velArray[i];
-			if (Math.abs(bPos[0]) >= 1 || Math.abs(bPos[1]) >= 1) { 
+			if (Math.abs(bPos[0]) >= 1.075 || Math.abs(bPos[1]) >= 1.075) { 
 				bv.remove(bVelocity);
 				bp.remove(bPos);
 				continue;
@@ -79,13 +77,6 @@ public class Flatscape {
 		// changes angle on character (Stolen from tim's program)
 		double TriAngle = Math.toDegrees(Math.atan((StdDraw.mouseY() - ry)/(StdDraw.mouseX() - rx))) - 90;
 		if (StdDraw.mouseX() < rx) TriAngle = TriAngle - 180;
-		
-		// updates position, moving character towards mouse
-		/*if (StdDraw.mouseX() != rx && StdDraw.mouseY() != ry && StdDraw.mousePressed()) {
-			vx = (StdDraw.mouseX() - rx) / 30;
-			vy = (StdDraw.mouseY() - ry) / 30;
-			 
-		}*/
 		
 		rx = rx + vx;
 		ry = ry + vy;
@@ -104,13 +95,13 @@ public class Flatscape {
 	private static void keyboard() {
 		vx = vy = 0;
 		if(StdDraw.isKeyPressed(KeyEvent.VK_W)) {
-			vy += .025;
+			vy += .0225;
 		} if(StdDraw.isKeyPressed(KeyEvent.VK_A)) {
-			vx -= .025;
+			vx -= .0225;
 		} if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
-			vy -= .025;
+			vy -= .0225;
 		} if(StdDraw.isKeyPressed(KeyEvent.VK_D)) {
-			vx += .025;
+			vx += .0225;
 		}
 	}
 } 

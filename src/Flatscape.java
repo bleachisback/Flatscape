@@ -16,8 +16,8 @@ public class Flatscape {
 	public static final int BULLET_DELAY = 15;
 	public static final Color[] METEOR_COLORS = {Color.PINK, Color.GREEN, Color.WHITE, Color.RED};
 	public static final int METEOR_DELAY = 80;
-	public static final double METEOR_MAX_SPEED = .017;
-	public static final double SHIP_SPEED = .018;
+	public static final double METEOR_MAX_SPEED = .0075;
+	public static final double SHIP_SPEED = .015;
 	
 	public static void main(String[] args) {
 
@@ -56,7 +56,7 @@ public class Flatscape {
 	}
 	
 	private static void addBullet() {
-		double[] tempV = smallerHypot(StdDraw.mouseX() - rx, StdDraw.mouseY() - ry, BULLET_SPEED);    //velocity is equal to BULLET_SPEED in the direction of the mous pointer in relation to the character
+		double[] tempV = smallerHypot(StdDraw.mouseX() - rx, StdDraw.mouseY() - ry, BULLET_SPEED);    //velocity is equal to BULLET_SPEED in the direction of the mouse pointer in relation to the character
 		double[] tempP = {rx, ry};    //initial position of bullet is equal to position of character
 		bv.add(tempV);		
 		bp.add(tempP);
@@ -64,7 +64,7 @@ public class Flatscape {
 	
 	private static void addMeteor() {
 		double[] xArr = new double[5], yArr = new double[5];
-		double size = .2;
+		double size = .25;
 		
 		double xOffset = 0;
 		double yOffset = 0;
@@ -87,22 +87,24 @@ public class Flatscape {
 		
 		xArr = new double[5];
 		yArr = new double[5];
+		double[] hitbox = {0, 0, 0, 0};
 		for(int i=0; i<5; i++)
 		{
 			xArr[i] = Math.random() * size * 2 - size + xOffset;
 			yArr[i] = Math.random() * size * 2 - size + yOffset;
+			hitbox[0] = yArr[i] - yOffset > hitbox[0] ? yArr[i] - yOffset : hitbox[0];
 		}
 		double[][] coords = {xArr, yArr};
 		mp.add(coords);
 		double[] velocity = smallerHypot(xOffset*-1, yOffset*-1, METEOR_MAX_SPEED);
-		velocity[0] += Math.random() * .02 - .01;
-		velocity[1] += Math.random() * .02 - .01;
+		velocity[0] += Math.random() * .01 - .005;
+		velocity[1] += Math.random() * .01 - .005;
 		mv.add(velocity);
 		int random = (int) (Math.random() * METEOR_COLORS.length);
-		System.out.println(random);
 		mc.add(METEOR_COLORS[random]);
 	}
 	
+	//Every frame, draw every bullet and advance their position
 	private static void drawBullets() {
 		StdDraw.setPenColor(StdDraw.YELLOW);
 		

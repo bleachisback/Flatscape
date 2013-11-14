@@ -1,37 +1,49 @@
-import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-public class Flatscape { 
+import javax.swing.JFrame;
+
+public class Flatscape implements KeyListener{ 
 	
 	private static ArrayList<double[]> bp = new ArrayList<double[]>();     // position (bullets)
 	private static ArrayList<double[]> bv = new ArrayList<double[]>();     // velocity (bullets)
-	private static ArrayList<Color> mc = new  ArrayList<Color>();    // color (meteors);
-	private static ArrayList<double[][]> mp = new ArrayList<double[][]>();    // position (meteors)
-	private static ArrayList<double[]> mv = new ArrayList<double[]>();    // velocity (meteors)
+	private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	private static ArrayList<Enemy> enemyRemoval = new ArrayList<Enemy>();
 	private static double rx  = .48, ry = .86;   // position (character)		
-	private static double vx = 0.015, vy = 0.023;     // velocity (character)
+	private static double vx = 0.015, vy = 0.023;     // velocity (character)	
 	
 	public static final double BULLET_SPEED = 0.0175;    //The distance the bullet travels, per frame
-	public static final int BULLET_DELAY = 15;
-	public static final Color[] METEOR_COLORS = {Color.PINK, Color.GREEN, Color.WHITE, Color.RED};
+	public static final int BULLET_DELAY = 15;	
 	public static final int METEOR_DELAY = 80;
 	public static final double METEOR_MAX_SPEED = .0075;
 	public static final double SHIP_SPEED = .015;
 	
+	public static boolean stop = false;
+	
 	public static void main(String[] args) {
-
+		JFrame frame = null;
+		try {
+			Field frameField = StdDraw.class.getDeclaredField("frame");
+			frameField.setAccessible(true);
+			frame = (JFrame) frameField.get(null);
+		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e1) {
+			e1.printStackTrace();
+		}
+		frame.addKeyListener(new Flatscape());
 		// set the scale of the coordinate system
 		StdDraw.setXscale(-1.0, 1.0);
-		StdDraw.setYscale(-1.0, 1.0);
-		 
+		StdDraw.setYscale(-1.0, 1.0);		
+		
 		int currentBulletDelay = 0;
 		int currentMeteorDelay = METEOR_DELAY;
 
 		// main animation loop		
 		while (true)  {
 			keyboard();
-			drawCursor();			
+			drawCursor();
+			removeEnemies();
 
 			if(currentBulletDelay <= 0) {
 				currentBulletDelay = 0;
@@ -42,15 +54,19 @@ public class Flatscape {
 			}			
 			if(currentMeteorDelay <= 0) {
 				currentMeteorDelay = METEOR_DELAY;
-				addMeteor();
+				enemies.add(new Meteor());
 			}
 
 			drawBullets();
-			drawMeteors();
+			if(stop) continue;
+			for(Enemy enemy : enemies) {
+				enemy.draw();
+				enemy.move();
+			}			
 			currentBulletDelay--;
 			currentMeteorDelay--;
 			
-			StdDraw.show(0); 	
+			StdDraw.show(0);	
 			StdDraw.picture(0,0, "Background.png", 5, 5);
 		} 
 	}
@@ -60,48 +76,6 @@ public class Flatscape {
 		double[] tempP = {rx, ry};    //initial position of bullet is equal to position of character
 		bv.add(tempV);		
 		bp.add(tempP);
-	}
-	
-	private static void addMeteor() {
-		double[] xArr = new double[5], yArr = new double[5];
-		double size = .25;
-		
-		double xOffset = 0;
-		double yOffset = 0;
-		switch(((int) (Math.random() * 3))) {
-			case 0:
-				xOffset = -1.25;
-				break;
-			case 1:
-				xOffset = 1.25;
-				break;
-			case 2:
-				yOffset = 1.25;
-				break;
-			case 3:
-				yOffset = -1.25;
-				break;
-		}
-		xOffset += xOffset == 0 ? Math.random() * 3 - 1 : xOffset;
-		yOffset += yOffset == 0 ? Math.random() * 3 - 1 : yOffset;
-		
-		xArr = new double[5];
-		yArr = new double[5];
-		double[] hitbox = {0, 0, 0, 0};
-		for(int i=0; i<5; i++)
-		{
-			xArr[i] = Math.random() * size * 2 - size + xOffset;
-			yArr[i] = Math.random() * size * 2 - size + yOffset;
-			hitbox[0] = yArr[i] - yOffset > hitbox[0] ? yArr[i] - yOffset : hitbox[0];
-		}
-		double[][] coords = {xArr, yArr};
-		mp.add(coords);
-		double[] velocity = smallerHypot(xOffset*-1, yOffset*-1, METEOR_MAX_SPEED);
-		velocity[0] += Math.random() * .01 - .005;
-		velocity[1] += Math.random() * .01 - .005;
-		mv.add(velocity);
-		int random = (int) (Math.random() * METEOR_COLORS.length);
-		mc.add(METEOR_COLORS[random]);
 	}
 	
 	//Every frame, draw every bullet and advance their position
@@ -145,31 +119,6 @@ public class Flatscape {
 		StdDraw.picture(rx, ry, "Triangle.png",.1,.1,TriAngle);
 	}
 	
-	private static void drawMeteors() {
-		double[][][] posArray = mp.toArray(new double[0][0][0]);
-		double[][] velArray = mv.toArray(new double[0][0]);
-		Color[] colorArray = mc.toArray(new Color[0]);
-		mp.clear();
-		mv.clear();
-		mc.clear();
-		for(int i = 0;i < posArray.length; i++) {
-			double[][] mPos = posArray[i];
-			double[] mVelocity = velArray[i];
-			if (Math.abs(mPos[0][0]) >= 3 || Math.abs(mPos[1][0]) >= 3) { 
-				continue;
-			}
-			StdDraw.setPenColor(colorArray[i]);
-			for(int j = 0; j < mPos[0].length; j++) {
-				mPos[0][j] = mPos[0][j] + mVelocity[0];
-				mPos[1][j] = mPos[1][j] + mVelocity[1];
-			}
-			StdDraw.polygon(mPos[0], mPos[1]);
-			mp.add(mPos);
-			mv.add(mVelocity);
-			mc.add(colorArray[i]);
-		}		
-	}
-	
 	private static void keyboard() {
 		vx = vy = 0;
 		if(StdDraw.isKeyPressed(KeyEvent.VK_W)) {
@@ -183,9 +132,35 @@ public class Flatscape {
 		}
 	}
 	
+	public static void removeEnemy(Enemy enemy) {
+		enemyRemoval.add(enemy);
+	}
+	
+	private static void removeEnemies() {
+		for(Enemy enemy : enemyRemoval) {
+			enemies.remove(enemy);
+		}
+		enemyRemoval.clear();
+	}
+	
 	public static double[] smallerHypot(double adj, double opp, double targetHypot) {
 		double angle = Math.atan(opp / adj);
 		double[] returnee = {Math.cos(angle) * targetHypot * (adj / Math.abs(adj)), Math.sin(angle) * targetHypot * (adj / Math.abs(adj))};
 		return returnee;
 	}
+	
+	public Flatscape() {}
+	
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+			stop = !stop;
+		}		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent arg0) {}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {}
 } 

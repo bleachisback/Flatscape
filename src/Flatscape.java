@@ -7,18 +7,20 @@ import javax.swing.JFrame;
 
 public class Flatscape implements KeyListener{ 
 	
-	private static ArrayList<double[]> bp = new ArrayList<double[]>();     // position (bullets)
-	private static ArrayList<double[]> bv = new ArrayList<double[]>();     // velocity (bullets)
+	private static ArrayList<Point> bp = new ArrayList<Point>();     // position (bullets)
+	private static ArrayList<Point> bv = new ArrayList<Point>();     // velocity (bullets)
+	private static ArrayList<Point> bulletRemoval = new ArrayList<Point>();
 	private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private static ArrayList<Enemy> enemyRemoval = new ArrayList<Enemy>();
-	private static double rx  = .48, ry = .86;   // position (character)		
-	private static double vx = 0.015, vy = 0.023;     // velocity (character)	
+	private static double rx  = 48, ry = 86;   // position (character)		
+	private static double vx = 1.5, vy = 02.3;     // velocity (character)	
 	
-	public static final double BULLET_SPEED = 0.0175;    //The distance the bullet travels, per frame
+	public static final double BULLET_SPEED = 1.75;    //The distance the bullet travels, per frame
 	public static final int BULLET_DELAY = 15;	
-	public static final int METEOR_DELAY = 80;
-	public static final double METEOR_MAX_SPEED = .0075;
-	public static final double SHIP_SPEED = .015;
+	public static final double INFINITY = 90;
+	public static final int METEOR_DELAY = 86; //normally 80
+	public static final double SCALE = 100;
+	public static final double SHIP_SPEED = 1.5;	
 	
 	public static boolean stop = false;
 	
@@ -33,17 +35,21 @@ public class Flatscape implements KeyListener{
 		}
 		frame.addKeyListener(new Flatscape());
 		// set the scale of the coordinate system
-		StdDraw.setXscale(-1.0, 1.0);
-		StdDraw.setYscale(-1.0, 1.0);		
+		StdDraw.setXscale(-SCALE, SCALE);
+		StdDraw.setYscale(-SCALE, SCALE);		
 		
 		int currentBulletDelay = 0;
 		int currentMeteorDelay = METEOR_DELAY;
+		
+		//long time = System.currentTimeMillis();
+		//int frames = 0;
 
 		// main animation loop		
-		while (true)  {
+		while (true)  {			
 			keyboard();
+			if(stop) continue;
 			drawCursor();
-			removeEnemies();
+			removeEnemies();			
 
 			if(currentBulletDelay <= 0) {
 				currentBulletDelay = 0;
@@ -55,46 +61,62 @@ public class Flatscape implements KeyListener{
 			if(currentMeteorDelay <= 0) {
 				currentMeteorDelay = METEOR_DELAY;
 				enemies.add(new Meteor());
+				//stop = true;
 			}
 
-			drawBullets();
-			if(stop) continue;
+			drawBullets();			
 			for(Enemy enemy : enemies) {
+				if(enemy == null) {
+					removeEnemy(enemy);
+					continue;
+				}
 				enemy.draw();
 				enemy.move();
 			}			
+			
 			currentBulletDelay--;
 			currentMeteorDelay--;
 			
-			StdDraw.show(0);	
-			StdDraw.picture(0,0, "Background.png", 5, 5);
+			hitDetect();
+			StdDraw.show(0);
+			StdDraw.picture(0,0, "Background.png", 500, 500);			
+			
+			/*if(System.currentTimeMillis() >= time + 1000) {
+				System.out.println(frames);
+				time = System.currentTimeMillis();
+				frames = 0;
+			} else {
+				frames++;
+			}*/
 		} 
 	}
 	
 	private static void addBullet() {
-		double[] tempV = smallerHypot(StdDraw.mouseX() - rx, StdDraw.mouseY() - ry, BULLET_SPEED);    //velocity is equal to BULLET_SPEED in the direction of the mouse pointer in relation to the character
-		double[] tempP = {rx, ry};    //initial position of bullet is equal to position of character
-		bv.add(tempV);		
-		bp.add(tempP);
+		bv.add(new Point(FMath.smallerHypot(StdDraw.mouseX() - rx, StdDraw.mouseY() - ry, BULLET_SPEED))); //velocity is equal to BULLET_SPEED in the direction of the mouse pointer in relation to the character
+		bp.add(new Point(rx, ry)); //initial position of bullet is equal to position of character
+	}
+	
+	public static void addEnemy(Enemy enemy) {
+		enemies.add(enemy);
 	}
 	
 	//Every frame, draw every bullet and advance their position
 	private static void drawBullets() {
 		StdDraw.setPenColor(StdDraw.YELLOW);
 		
-		double[][] posArray = bp.toArray(new double[0][0]);
-		double[][] velArray = bv.toArray(new double[0][0]);
+		Point[] posArray = bp.toArray(new Point[0]);
+		Point[] velArray = bv.toArray(new Point[0]);
 		bp.clear();
 		bv.clear();
 		for(int i = 0;i < posArray.length; i++) {
-			double[] bPos = posArray[i];
-			double[] bVelocity = velArray[i];
-			if (Math.abs(bPos[0]) >= 1.075 || Math.abs(bPos[1]) >= 1.075) { 
+			Point bPos = posArray[i];
+			Point bVelocity = velArray[i];
+			if (Math.abs(bPos.x) >= 107.5 || Math.abs(bPos.y) >= 107.5) { 
 				continue;
 			}				
-			bPos[0] = bPos[0] + bVelocity[0];
-			bPos[1] = bPos[1] + bVelocity[1];
-			StdDraw.filledCircle(bPos[0], bPos[1], .009);
+			bPos.x = bPos.x + bVelocity.x;
+			bPos.y = bPos.y + bVelocity.y;
+			StdDraw.filledCircle(bPos.x, bPos.y, .9);
 			bp.add(bPos);
 			bv.add(bVelocity);
 		}
@@ -107,16 +129,28 @@ public class Flatscape implements KeyListener{
 		
 		rx = rx + vx;
 		ry = ry + vy;
-		rx = rx > 1 ? 1 : rx < -1 ? -1 : rx;
-		ry = ry > 1 ? 1 : ry < -1 ? -1 : ry;
+		rx = rx > SCALE ? SCALE : rx < -SCALE ? -SCALE : rx;
+		ry = ry > SCALE ? SCALE : ry < -SCALE ? -SCALE : ry;
 
 		// Target drawn
 		StdDraw.setPenColor(StdDraw.RED);
-		StdDraw.circle(StdDraw.mouseX(), StdDraw.mouseY(), .05);
+		StdDraw.circle(StdDraw.mouseX(), StdDraw.mouseY(), 5);
 
 		// draw character on the screen
 		StdDraw.setPenColor(StdDraw.BLUE);
-		StdDraw.picture(rx, ry, "Triangle.png",.1,.1,TriAngle);
+		StdDraw.picture(rx, ry, "Triangle.png", 10, 10, TriAngle);
+	}
+	
+	public static void hitDetect() {
+		loop: for(Enemy enemy : enemies) {
+			for(Point point : bp) {
+				if(enemy.detectHit(point)) {
+					removeBullet(point);
+					removeEnemy(enemy);
+					continue loop;
+				}
+			}
+		}
 	}
 	
 	private static void keyboard() {
@@ -132,6 +166,10 @@ public class Flatscape implements KeyListener{
 		}
 	}
 	
+	public static void removeBullet(Point point) {
+		bulletRemoval.add(point);
+	}
+	
 	public static void removeEnemy(Enemy enemy) {
 		enemyRemoval.add(enemy);
 	}
@@ -140,17 +178,15 @@ public class Flatscape implements KeyListener{
 		for(Enemy enemy : enemyRemoval) {
 			enemies.remove(enemy);
 		}
+		for(Point point : bulletRemoval) {
+			if(!bp.contains(point)) continue;
+			bv.remove(bp.indexOf(point));
+			bp.remove(point);
+		}
 		enemyRemoval.clear();
+		bulletRemoval.clear();
 	}
-	
-	public static double[] smallerHypot(double adj, double opp, double targetHypot) {
-		double angle = Math.atan(opp / adj);
-		double[] returnee = {Math.cos(angle) * targetHypot * (adj / Math.abs(adj)), Math.sin(angle) * targetHypot * (adj / Math.abs(adj))};
-		return returnee;
-	}
-	
-	public Flatscape() {}
-	
+		
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_SPACE) {

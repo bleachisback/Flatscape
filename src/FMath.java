@@ -1,7 +1,14 @@
 import java.awt.Color;
+import java.io.InputStream;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 
 public class FMath {
+	public static final String SOUND_PATH = "/sounds/";
+	
 	public static double angle(Point p1, Point p2, Point p3) {
 		double AB = length(p2, p1);
 		double BC = length(p2, p3);
@@ -95,6 +102,20 @@ public class FMath {
 	    return val == 0.0 ? 0 : val > 0.0 ? 1 : 2;
 	}
 	
+	public static synchronized void playSound(final String url) {
+		try {
+			Clip clip = AudioSystem.getClip();
+			InputStream stream = Flatscape.class.getResourceAsStream(SOUND_PATH + url + ".wav");
+			if(stream == null) System.out.println("stream null");
+			AudioInputStream inputStream = AudioSystem.getAudioInputStream(stream);
+			clip.open(inputStream);
+			clip.start(); 
+		} catch (Exception e) {
+			e.printStackTrace();
+			//System.err.println(e.getMessage());
+		}
+	}
+	
 	public static double sqr(double doub) {
 		return Math.pow(doub, 2);
 	}
@@ -106,9 +127,9 @@ public class FMath {
 		return doub;
 	}
 	
-	public static double[] smallerHypot(double adj, double opp, double targetHypot) {
+	public static Point smallerHypot(double adj, double opp, double targetHypot) {
 		double angle = Math.atan(opp / adj);
-		double[] returnee = {Math.cos(angle) * targetHypot * (adj / Math.abs(adj)), Math.sin(angle) * targetHypot * (adj / Math.abs(adj))};
+		Point returnee = new Point(Math.cos(angle) * targetHypot * (adj / Math.abs(adj)), Math.sin(angle) * targetHypot * (adj / Math.abs(adj)));
 		return returnee;
 	}
 }

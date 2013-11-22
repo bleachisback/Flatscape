@@ -11,6 +11,7 @@ public class Flatscape implements KeyListener{
 	private static ArrayList<Point> bv = new ArrayList<Point>();     // velocity (bullets)
 	private static ArrayList<Point> bulletRemoval = new ArrayList<Point>();
 	private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	private static ArrayList<Enemy> enemyAddition = new ArrayList<Enemy>();
 	private static ArrayList<Enemy> enemyRemoval = new ArrayList<Enemy>();
 	private static double rx  = 48, ry = 86;   // position (character)		
 	private static double vx = 1.5, vy = 02.3;     // velocity (character)	
@@ -91,12 +92,13 @@ public class Flatscape implements KeyListener{
 	}
 	
 	private static void addBullet() {
-		bv.add(new Point(FMath.smallerHypot(StdDraw.mouseX() - rx, StdDraw.mouseY() - ry, BULLET_SPEED))); //velocity is equal to BULLET_SPEED in the direction of the mouse pointer in relation to the character
+		FMath.playSound("pew1");
+		bv.add(FMath.smallerHypot(StdDraw.mouseX() - rx, StdDraw.mouseY() - ry, BULLET_SPEED)); //velocity is equal to BULLET_SPEED in the direction of the mouse pointer in relation to the character
 		bp.add(new Point(rx, ry)); //initial position of bullet is equal to position of character
 	}
 	
 	public static void addEnemy(Enemy enemy) {
-		enemies.add(enemy);
+		enemyAddition.add(enemy);
 	}
 	
 	//Every frame, draw every bullet and advance their position
@@ -145,8 +147,15 @@ public class Flatscape implements KeyListener{
 			for(Point point : bp) {
 				if(enemy.detectHit(point)) {
 					removeBullet(point);
-					removeEnemy(enemy);
+					enemy.onHit();
 					continue loop;
+				}
+			}
+			for(Enemy _enemy : enemies) {
+				if(enemy != _enemy && enemy instanceof Meteor && _enemy instanceof MeteorHitable) {
+					if(enemy.detectHit(_enemy.position)) {
+						_enemy.onMeteorHit((Meteor) enemy);
+					}
 				}
 			}
 		}
@@ -174,16 +183,20 @@ public class Flatscape implements KeyListener{
 	}
 	
 	private static void removeEnemies() {
-		for(Enemy enemy : enemyRemoval) {
-			enemies.remove(enemy);
-		}
 		for(Point point : bulletRemoval) {
 			if(!bp.contains(point)) continue;
 			bv.remove(bp.indexOf(point));
 			bp.remove(point);
 		}
-		enemyRemoval.clear();
+		for(Enemy enemy : enemyAddition) {
+			enemies.add(enemy);
+		}
+		for(Enemy enemy : enemyRemoval) {
+			enemies.remove(enemy);
+		}
 		bulletRemoval.clear();
+		enemyAddition.clear();
+		enemyRemoval.clear();		
 	}
 		
 	@Override

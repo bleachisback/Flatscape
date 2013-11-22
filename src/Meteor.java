@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.util.ArrayList;
 
 
 public class Meteor extends Enemy{
@@ -6,7 +7,8 @@ public class Meteor extends Enemy{
 	public static final double MAX_SPEED = 0.75;
 	public static final int POINTS = 5;
 	
-	public Color color;	
+	public Color color;
+	public ArrayList<Meteor> noHitList = new ArrayList<Meteor>();
 	public Point[] points;
 	public double size;
 	
@@ -19,7 +21,7 @@ public class Meteor extends Enemy{
 	}
 	
 	public Meteor(Color color, Point pos) {
-		this(color, pos, new Point(FMath.smallerHypot(pos.x * -1, pos.y * -1, MAX_SPEED)).deviate(0.25, MAX_SPEED));
+		this(color, pos, FMath.smallerHypot(pos.x * -1, pos.y * -1, MAX_SPEED).deviate(0.25, MAX_SPEED));
 	}
 	
 	public Meteor(Color color, Point pos, Point velocity) {
@@ -87,7 +89,7 @@ public class Meteor extends Enemy{
 					initialise();
 					return;
 				}				
-			}	
+			}			
 			
 			degrees -= tempDegrees;
 			
@@ -96,22 +98,13 @@ public class Meteor extends Enemy{
 			System.out.println(Math.sin(tempDegrees));
 			StdDraw.filledCircle(pointsX[i], pointsY[i], 0.9);*/
 		}
-		/*int i = 0;		
-		do {
-			int next = (i + 1) % POINTS;			
-			if(doIntersect(points[i], points[next], p, extreme)) {
-				count++;
-			}
-			i = next;
-		} while(i != 0);*/
 		for(int i = 2; i < POINTS; i++) {
 			for(int j = i - 1; j > 0 ; j--) {
-				System.out.println("Testing line " + (i + 1) + " against line " + (j - 1));
 				if(FMath.doIntersect(points[i], points[(i + 1) % POINTS], points[j], points[j - 1])) {
 					initialise();
 					return;
 				}
-			}			
+			}
 		}
 		/*System.out.println("- - - - - - - - - - -");
 		StdDraw.polygon(pointsX, pointsY);*/
@@ -125,13 +118,30 @@ public class Meteor extends Enemy{
 		}
 	}
 	
-	public void onMeteorHit(Meteor meteor) {
+	public void onHit() {
+		FMath.playSound("meteorDestroy1");
 		remove();
-		if(size > 20) {
-			for (int i = 0; i < 4; i++) {
-				Flatscape.addEnemy(new Meteor(color, position, new Point(FMath.randomNegative(Math.random() * velocity.x), FMath.randomNegative(Math.random() * velocity.y)), size / 2));
+		if(size < 18) return;
+		ArrayList<Meteor> meteors = new ArrayList<Meteor>();
+		for (int i = 0; i < 4; i++) {
+			Point newPos = randomRelativePos();
+			Point newVelocity = FMath.smallerHypot(position.x - newPos.x, position.y - newPos.y, MAX_SPEED / 1.5);
+			Meteor _meteor = new Meteor(color, newPos, newVelocity, size / 2);
+			meteors.add(_meteor);
+			Flatscape.addEnemy(_meteor);
+		}
+		for(Meteor _meteor : meteors) {
+			for(Meteor $meteor : meteors) {
+				if(_meteor == $meteor) continue;
+				_meteor.noHitList.add($meteor);
 			}
 		}
+	}
+	
+	public void onMeteorHit(Meteor meteor) {
+		if(noHitList.contains(meteor)) return;
+		meteor.onHit();
+		onHit();		
 	}
 	
 	private static Point randomPos() {
@@ -144,6 +154,10 @@ public class Meteor extends Enemy{
 			point.y = FMath.randomNegative(125);
 		}
 		return point;
+	}
+	
+	private Point randomRelativePos() {
+		return new Point(position.x + FMath.randomNegative(Math.random() * 5 + 5), position.y + FMath.randomNegative(Math.random() * 5 + 5));
 	}	
 	
 	public String toString() {

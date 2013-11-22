@@ -8,11 +8,6 @@ public class Point {
 		this.y = y;
 	}
 	
-	public Point(double[] coords) {
-		x = coords[0];
-		y = coords[1];
-	}
-	
 	public Point add(Point point) {
 		return new Point(x + point.x, y + point.y);
 	}
@@ -21,7 +16,7 @@ public class Point {
 		x += Math.random() * (deviation * 2) - deviation;
 		y += Math.random() * (deviation * 2) - deviation;
 		
-		return new Point(FMath.smallerHypot(x, y, max));
+		return FMath.smallerHypot(x, y, max);
 	}
 	
 	@Override

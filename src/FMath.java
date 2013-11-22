@@ -17,7 +17,7 @@ public class FMath {
 	}
 	
 	public static boolean doIntersect(Point p1, Point p2, Point p3, Point p4) {		
-		if(length(p3, p1) < length(p3, p2)) {
+		if(Math.abs(p3.y - p1.y) < Math.abs(p3.y - p2.y)) {
 			Point temp = p1;
 			p1 = p2;
 			p2 = temp;
@@ -52,8 +52,7 @@ public class FMath {
 		System.out.println("length of b:     " + Math.abs((length(p4, p1) * Math.sin(b)) / Math.sin(c)));
 		System.out.println("length of p1-p2: " + length(p1, p2) + "(Orange)");
 		System.out.println("length of c:     " + length(p4, p1) + "(Blue)");
-		System.out.println("---------------------------------");
-		Flatscape.stop = true;*/
+		System.out.println("---------------------------------");*/
 		return true;
 	}
 	

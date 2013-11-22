@@ -58,7 +58,7 @@ public class Meteor extends Enemy{
 			pointsX[j] = points[j].x + position.x;
 			pointsY[j] = points[j].y + position.y;
 		}
-		StdDraw.filledPolygon(pointsX, pointsY);		
+		StdDraw.polygon(pointsX, pointsY);		
 	}
 	
 	private void initialise() {

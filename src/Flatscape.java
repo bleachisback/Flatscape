@@ -18,11 +18,12 @@ public class Flatscape implements KeyListener{
 	
 	public static final double BULLET_SPEED = 1.75;    //The distance the bullet travels, per frame
 	public static final int BULLET_DELAY = 15;	
-	public static final double INFINITY = 90;
+	public static final double INFINITY = 150;
 	public static final int METEOR_DELAY = 86; //normally 80
 	public static final double SCALE = 100;
 	public static final double SHIP_SPEED = 1.5;	
 	
+	public static boolean gameOver = false;
 	public static boolean stop = false;
 	
 	public static void main(String[] args) {
@@ -31,8 +32,8 @@ public class Flatscape implements KeyListener{
 			Field frameField = StdDraw.class.getDeclaredField("frame");
 			frameField.setAccessible(true);
 			frame = (JFrame) frameField.get(null);
-		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e1) {
-			e1.printStackTrace();
+		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+			e.printStackTrace();
 		}
 		frame.addKeyListener(new Flatscape());
 		// set the scale of the coordinate system
@@ -46,7 +47,7 @@ public class Flatscape implements KeyListener{
 		//int frames = 0;
 
 		// main animation loop		
-		while (true)  {			
+		while (!gameOver)  {			
 			keyboard();
 			if(stop) continue;
 			drawCursor();
@@ -144,6 +145,10 @@ public class Flatscape implements KeyListener{
 	
 	public static void hitDetect() {
 		loop: for(Enemy enemy : enemies) {
+			if(enemy.detectHit(new Point(rx, ry))) {
+				enemy.onHit();
+				gameOver = true;
+			}
 			for(Point point : bp) {
 				if(enemy.detectHit(point)) {
 					removeBullet(point);

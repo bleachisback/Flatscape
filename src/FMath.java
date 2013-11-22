@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 
 import javax.sound.sampled.AudioInputStream;
@@ -104,12 +105,13 @@ public class FMath {
 	public static synchronized void playSound(final String url) {
 		try {
 			Clip clip = AudioSystem.getClip();
-			InputStream stream = Flatscape.class.getResourceAsStream(SOUND_PATH + url + ".wav");
-			if(stream == null) System.out.println("stream null");
-			AudioInputStream inputStream = AudioSystem.getAudioInputStream(stream);
+			InputStream stream = FMath.class.getResourceAsStream(SOUND_PATH + url + ".wav");
+			InputStream bufferedStream = new BufferedInputStream(stream);
+			AudioInputStream inputStream = AudioSystem.getAudioInputStream(bufferedStream);
 			clip.open(inputStream);
-			clip.start(); 
+			clip.start();
 		} catch (Exception e) {
+			Flatscape.stop = true;
 			e.printStackTrace();
 			//System.err.println(e.getMessage());
 		}

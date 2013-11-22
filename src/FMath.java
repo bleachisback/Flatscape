@@ -6,27 +6,24 @@ public class FMath {
 		double AB = length(p2, p1);
 		double BC = length(p2, p3);
 		double AC = length(p3, p1);
-	    return Math.toDegrees(Math.acos((sqr(BC) + sqr(AB) - sqr(AC)) / (2 * BC * AB)));
+	    return Math.acos((sqr(BC) + sqr(AB) - sqr(AC)) / (2 * BC * AB));
 	}
 	
 	public static boolean doIntersect(Point p1, Point p2, Point p3, Point p4) {		
-		if(((inMiddleOf(p1.x, p3.x, p2.x) || inMiddleOf(p1.x, p4.x, p2.x) || inMiddleOf(p3.x, p1.x, p4.x) || inMiddleOf(p3.x, p2.x, p4.x)) 
-				&& (inMiddleOf(p1.y, p3.y, p2.y) || inMiddleOf(p1.y, p4.y, p2.y) || inMiddleOf(p3.y, p1.y, p4.y )|| inMiddleOf(p3.y, p2.y, p4.y)))) {
-			double t = p1.x * p2.y - p2.x * p1.y;
-			double u = t + p3.x * (p2.y - p1.y) + p3.y * (p2.x - p1.x);
-			double v = t + p4.x * (p2.y - p1.y) + p4.y * (p2.x - p1.x);
-			return u * v <= 0;
+		if(length(p3, p1) < length(p3, p2)) {
+			Point temp = p1;
+			p1 = p2;
+			p2 = temp;
 		}
-		return false;
-		/*double a = angle(p4, p1, p2);
+		double a = angle(p4, p1, p2);
 		double b = angle(p1, p4, p3);
-		double c = 180 - b - a;
+		double c = Math.toRadians(180 - Math.toDegrees(b) - Math.toDegrees(a));
 				
-		if(c <= 0) return false;
+		if(Math.toDegrees(c) <= 0 || Math.toDegrees(c) >= 180) return false;
 		if(Math.abs((length(p4, p1) * Math.sin(a)) / Math.sin(c)) > length(p4, p3)) return false;
 		if(Math.abs((length(p4, p1) * Math.sin(b)) / Math.sin(c)) > length(p1, p2)) return false;
 		
-		StdDraw.setPenColor(StdDraw.BLUE);
+		/*StdDraw.setPenColor(StdDraw.BLUE);
 		StdDraw.filledCircle(p1.x, p1.y, 0.9);
 		StdDraw.line(p4.x, p4.y, p1.x, p1.y);
 		StdDraw.setPenColor(StdDraw.ORANGE);
@@ -42,13 +39,15 @@ public class FMath {
 		System.out.println("p4: " + p4);
 		System.out.println("p3: " + p3);
 		System.out.println("A: " + a + " B: " + b + " C: " + c);
+		System.out.println("A: " + Math.toDegrees(a) + " B: " + Math.toDegrees(b) + " C: " + Math.toDegrees(c));
 		System.out.println("length of a:     " + Math.abs((length(p4, p1) * Math.sin(a)) / Math.sin(c)));
 		System.out.println("length of p4-p3: " + length(p4, p3) + "(Cyan)");
 		System.out.println("length of b:     " + Math.abs((length(p4, p1) * Math.sin(b)) / Math.sin(c)));
 		System.out.println("length of p1-p2: " + length(p1, p2) + "(Orange)");
 		System.out.println("length of c:     " + length(p4, p1) + "(Blue)");
 		System.out.println("---------------------------------");
-		return true;*/
+		Flatscape.stop = true;*/
+		return true;
 	}
 	
 	public static String getColorString(Color color) {
@@ -67,10 +66,6 @@ public class FMath {
 	public static boolean hitboxCheck(Point boxPoint1, Point boxPoint2, Point point) {
 		return (point.x > Math.min(boxPoint1.x, boxPoint2.x) && point.x < Math.max(boxPoint1.x, boxPoint2.x)
 				&& point.y > Math.min(boxPoint1.y, boxPoint2.y) && point.y < Math.max(boxPoint1.y, boxPoint2.y));
-	}
-	
-	public static boolean inMiddleOf(double doub1, double doub2, double doub3) {
-		return doub1 <= doub2 && doub2 <= doub3;
 	}
 	
 	public static boolean insidePolygon(Point p, Point[] polygon) {
@@ -92,23 +87,6 @@ public class FMath {
 	
 	public static double length(Point point1, Point point2) {
 		return Math.sqrt(sqr(point1.x - point2.x) + sqr(point1.y - point2.y));
-	}
-	
-	public static boolean magnifyPoints(boolean force, Point... points) {
-		for(Point point : points) {
-			if(point.x < 0 || point.y < 0 || force) {
-				for(Point _point : points) {
-					_point.x += 1;
-					_point.y += 1;
-				}
-				return true;
-			}			
-		}
-		return false;
-	}
-	
-	public static boolean onSegment(Point p, Point q, Point r) {
-		return (q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y));
 	}
 	
 	public static int orientation(Point p, Point q, Point r) {

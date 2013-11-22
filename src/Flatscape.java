@@ -61,7 +61,6 @@ public class Flatscape implements KeyListener{
 			if(currentMeteorDelay <= 0) {
 				currentMeteorDelay = METEOR_DELAY;
 				enemies.add(new Meteor());
-				//stop = true;
 			}
 
 			drawBullets();			

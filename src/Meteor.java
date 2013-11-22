@@ -87,13 +87,7 @@ public class Meteor extends Enemy{
 					initialise();
 					return;
 				}				
-			}
-			for(int j = i - 2; j > 0 && i < POINTS - 1 && i > 2; j--) {
-				if(FMath.doIntersect(points[i], points[i-1], points[j], points[j-1])) {
-					initialise();
-					return;
-				}				
-			}
+			}	
 			
 			degrees -= tempDegrees;
 			
@@ -101,6 +95,23 @@ public class Meteor extends Enemy{
 			System.out.println((i + 1) + ": " + pointsX[i] + ", " + pointsY[i] + ", Degrees: " + tempDegrees + ", Length: " + length);
 			System.out.println(Math.sin(tempDegrees));
 			StdDraw.filledCircle(pointsX[i], pointsY[i], 0.9);*/
+		}
+		/*int i = 0;		
+		do {
+			int next = (i + 1) % POINTS;			
+			if(doIntersect(points[i], points[next], p, extreme)) {
+				count++;
+			}
+			i = next;
+		} while(i != 0);*/
+		for(int i = 2; i < POINTS; i++) {
+			for(int j = i - 1; j > 0 ; j--) {
+				System.out.println("Testing line " + (i + 1) + " against line " + (j - 1));
+				if(FMath.doIntersect(points[i], points[(i + 1) % POINTS], points[j], points[j - 1])) {
+					initialise();
+					return;
+				}
+			}			
 		}
 		/*System.out.println("- - - - - - - - - - -");
 		StdDraw.polygon(pointsX, pointsY);*/

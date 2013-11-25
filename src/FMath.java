@@ -8,7 +8,7 @@ import javax.sound.sampled.Clip;
 
 
 public class FMath {
-	public static final String SOUND_PATH = "/sounds/";
+	public static String SOUND_PATH = "/sounds/default/";
 	
 	public static double angle(Point p1, Point p2, Point p3) {
 		double AB = length(p2, p1);
@@ -111,9 +111,7 @@ public class FMath {
 			clip.open(inputStream);
 			clip.start();
 		} catch (Exception e) {
-			Flatscape.stop = true;
 			e.printStackTrace();
-			//System.err.println(e.getMessage());
 		}
 	}
 	

@@ -119,7 +119,7 @@ public class Meteor extends Enemy{
 	}
 	
 	public void onHit() {
-		FMath.playSound("meteorDestroy1");
+		FMath.playSound("Meteor_Destroy0");
 		remove();
 		if(size < 18) return;
 		ArrayList<Meteor> meteors = new ArrayList<Meteor>();

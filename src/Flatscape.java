@@ -2,6 +2,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
 
@@ -26,6 +27,9 @@ public class Flatscape implements KeyListener{
 	public static boolean gameOver = false;
 	public static boolean stop = false;
 	
+	private HashMap<int[], Integer> keySequenceProgress = new HashMap<int[], Integer>();
+	private HashMap<int[], Runnable> keySequenceRunnable = new HashMap<int[], Runnable>();
+	
 	public static void main(String[] args) {
 		JFrame frame = null;
 		try {
@@ -35,71 +39,28 @@ public class Flatscape implements KeyListener{
 		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
 			e.printStackTrace();
 		}
-		frame.addKeyListener(new Flatscape());
+		Flatscape flatscape = new Flatscape();
+		frame.addKeyListener(flatscape);
 		// set the scale of the coordinate system
 		StdDraw.setXscale(-SCALE, SCALE);
-		StdDraw.setYscale(-SCALE, SCALE);		
+		StdDraw.setYscale(-SCALE, SCALE);
 		
-		int currentBulletDelay = 0;
-		int currentMeteorDelay = METEOR_DELAY;
-		
-		//long time = System.currentTimeMillis();
-		//int frames = 0;
-
-		// main animation loop		
-		while (!gameOver)  {			
-			keyboard();
-			if(stop) continue;
-			drawCursor();
-			removeEnemies();			
-
-			if(currentBulletDelay <= 0) {
-				currentBulletDelay = 0;
-				if(StdDraw.mousePressed()) {
-					currentBulletDelay = BULLET_DELAY;
-					addBullet();					
-				}
-			}			
-			if(currentMeteorDelay <= 0) {
-				currentMeteorDelay = METEOR_DELAY;
-				enemies.add(new Meteor());
-			}
-
-			drawBullets();			
-			for(Enemy enemy : enemies) {
-				if(enemy == null) {
-					removeEnemy(enemy);
-					continue;
-				}
-				enemy.draw();
-				enemy.move();
-			}			
-			
-			currentBulletDelay--;
-			currentMeteorDelay--;
-			
-			hitDetect();
-			StdDraw.show(0);
-			StdDraw.picture(0,0, "Background.png", 500, 500);			
-			
-			/*if(System.currentTimeMillis() >= time + 1000) {
-				System.out.println(frames);
-				time = System.currentTimeMillis();
-				frames = 0;
-			} else {
-				frames++;
-			}*/
-		} 
+		startMenu(flatscape);
 	}
 	
 	private static void addBullet() {
-		FMath.playSound("pew1");
+		FMath.playSound("Laser_Shoot0");
 		bv.add(FMath.smallerHypot(StdDraw.mouseX() - rx, StdDraw.mouseY() - ry, BULLET_SPEED)); //velocity is equal to BULLET_SPEED in the direction of the mouse pointer in relation to the character
 		bp.add(new Point(rx, ry)); //initial position of bullet is equal to position of character
 	}
 	
 	public static void addEnemy(Enemy enemy) {
 		enemyAddition.add(enemy);
+	}
+	
+	public void addKeySequence(int[] keys, Runnable runnable) {
+		keySequenceProgress.put(keys, 0);
+		keySequenceRunnable.put(keys, runnable);
 	}
 	
 	//Every frame, draw every bullet and advance their position
@@ -146,8 +107,9 @@ public class Flatscape implements KeyListener{
 	public static void hitDetect() {
 		loop: for(Enemy enemy : enemies) {
 			if(enemy.detectHit(new Point(rx, ry))) {
-				enemy.onHit();
 				gameOver = true;
+				FMath.playSound("Game_Over");
+				return;
 			}
 			for(Point point : bp) {
 				if(enemy.detectHit(point)) {
@@ -208,7 +170,21 @@ public class Flatscape implements KeyListener{
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
 			stop = !stop;
-		}		
+		}
+		for(int[] keys : keySequenceProgress.keySet()) {
+			int progress = keySequenceProgress.get(keys);
+			if(keys[progress] == e.getKeyCode()) {
+				if(progress == keys.length - 1) {
+					keySequenceRunnable.get(keys).run();
+					keySequenceRunnable.remove(keys);
+					keySequenceProgress.remove(keys);
+					continue;
+				}
+				keySequenceProgress.put(keys, progress + 1);
+			} else {
+				keySequenceProgress.put(keys, 0);
+			}
+		}
 	}
 
 	@Override
@@ -216,4 +192,71 @@ public class Flatscape implements KeyListener{
 
 	@Override
 	public void keyTyped(KeyEvent arg0) {}
+	
+	public static void startGame() {
+		int currentBulletDelay = 0;
+		int currentMeteorDelay = METEOR_DELAY;
+		
+		//long time = System.currentTimeMillis();
+		//int frames = 0;
+
+		// main animation loop		
+		while (!gameOver)  {			
+			StdDraw.picture(0,0, "Background.png", 500, 500);
+			keyboard();
+			if(stop) continue;
+			drawCursor();
+			removeEnemies();			
+
+			if(currentBulletDelay <= 0) {
+				currentBulletDelay = 0;
+				if(StdDraw.mousePressed()) {
+					currentBulletDelay = BULLET_DELAY;
+					addBullet();					
+				}
+			}			
+			if(currentMeteorDelay <= 0) {
+				currentMeteorDelay = METEOR_DELAY;
+				enemies.add(new Meteor());
+			}
+
+			drawBullets();			
+			for(Enemy enemy : enemies) {
+				if(enemy == null) {
+					removeEnemy(enemy);
+					continue;
+				}
+				enemy.draw();
+				enemy.move();
+			}			
+			
+			currentBulletDelay--;
+			currentMeteorDelay--;
+			
+			hitDetect();
+			StdDraw.show(0);						
+			
+			/*if(System.currentTimeMillis() >= time + 1000) {
+				System.out.println(frames);
+				time = System.currentTimeMillis();
+				frames = 0;
+			} else {
+				frames++;
+			}*/
+		} 
+	}
+	
+	public static void startMenu(Flatscape flatscape) {
+		int[] keys = {KeyEvent.VK_UP, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_DOWN,  KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_B, KeyEvent.VK_A, KeyEvent.VK_ENTER};
+		flatscape.addKeySequence(keys, new Runnable() {
+			public void run() {
+				FMath.SOUND_PATH = "/sounds/secret/";
+			}
+		});
+		/*boolean start = false;
+		while(!start) {
+			
+		}*/
+		startGame();
+	}
 } 

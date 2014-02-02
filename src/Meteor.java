@@ -10,6 +10,7 @@ public class Meteor extends Enemy{
 	public Color color;
 	public ArrayList<Meteor> noHitList = new ArrayList<Meteor>();
 	public Point[] points;
+	public double rotation;
 	public double size;
 	
 	public Meteor() {
@@ -27,12 +28,18 @@ public class Meteor extends Enemy{
 	public Meteor(Color color, Point pos, Point velocity) {
 		this(color, pos, velocity, Math.random() * 20 + 7.5);
 	}
+	
 	public Meteor(Color color, Point pos, Point velocity, double size) {
+		this(color, pos, velocity, size, Math.random() * 30 - 15);
+	}
+	
+	public Meteor(Color color, Point pos, Point velocity, double size, double rotation) {
 		this.color = color;
 		this.velocity = velocity;
 		this.position = pos;
 		this.size = size;
-		initialise();		
+		this.rotation = rotation;
+		initialise();
 	}
 	
 	public boolean detectHit(Point point) {
@@ -43,11 +50,11 @@ public class Meteor extends Enemy{
 	}
 	
 	public Point[] getRealPoints() {
-		Point[] _points = new Point[POINTS];
+		Point[] points = new Point[POINTS];
 		for(int i = 0; i < POINTS; i++) {
-			_points[i] = points[i].add(position);
+			points[i] = this.points[i].add(position);
 		}
-		return _points;
+		return points;
 	}
 	
 	public void draw() {
@@ -116,6 +123,7 @@ public class Meteor extends Enemy{
 		if(Math.abs(position.x) >= 300 || Math.abs(position.y) >= 300) {
 			remove();
 		}
+		//rotate(rotation);
 	}
 	
 	public void onHit() {
@@ -158,7 +166,14 @@ public class Meteor extends Enemy{
 	
 	private Point randomRelativePos() {
 		return new Point(position.x + FMath.randomNegative(Math.random() * 5 + 5), position.y + FMath.randomNegative(Math.random() * 5 + 5));
-	}	
+	}
+	
+	private void rotate(double rotation) {
+		for(Point point : points) {
+			double angle = Math.toDegrees(Math.atan((point.x - position.x) / (point.y - position.y)));
+			
+		}
+	}
 	
 	public String toString() {
 		return FMath.getColorString(color) + "Meteor " + size + " large.";

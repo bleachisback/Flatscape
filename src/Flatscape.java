@@ -8,21 +8,21 @@ import javax.swing.JFrame;
 
 public class Flatscape implements KeyListener{ 
 	
-	private static ArrayList<Point> bp = new ArrayList<Point>();     // position (bullets)
-	private static ArrayList<Point> bv = new ArrayList<Point>();     // velocity (bullets)
+	private static ArrayList<Point> bp = new ArrayList<Point>();// position (bullets). Needs to be added to projectile class
+	private static ArrayList<Point> bv = new ArrayList<Point>();// velocity (bullets). Needs to be added to projectile class
 	private static ArrayList<Point> bulletRemoval = new ArrayList<Point>();
 	private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private static ArrayList<Enemy> enemyAddition = new ArrayList<Enemy>();
 	private static ArrayList<Enemy> enemyRemoval = new ArrayList<Enemy>();
-	private static double rx  = 48, ry = 86;   // position (character)		
-	private static double vx = 1.5, vy = 02.3;     // velocity (character)	
+	private static double rx  = 48, ry = 86;// position (character). Needs to be added to player class.
+	private static double vx = 1.5, vy = 02.3;// velocity (character). Needs to be added to player class.
 	
-	public static final double BULLET_SPEED = 1.75;    //The distance the bullet travels, per frame
-	public static final int BULLET_DELAY = 15;	
-	public static final double INFINITY = 150;
-	public static final int METEOR_DELAY = 86; //normally 80
-	public static final double SCALE = 100;
-	public static final double SHIP_SPEED = 1.5;	
+	public static final double BULLET_SPEED = 1.75;//The distance the bullet travels, per frame
+	public static final int BULLET_DELAY = 15;//The number of frames in between shots. Needs to be changed to ms.
+	public static final double INFINITY = 150;//"Infinity" for use of line hit-detection.
+	public static final int METEOR_DELAY = 86; //The number of frames in between meteor spawns. Needs to be changed to ms and given a range.
+	public static final double SCALE = 100;//The maximum and minimum screen boundaries.
+	public static final double SHIP_SPEED = 1.5;//The number of units the ship moves per frame.
 	
 	public static boolean gameOver = false;
 	public static boolean stop = false;
@@ -42,8 +42,8 @@ public class Flatscape implements KeyListener{
 		Flatscape flatscape = new Flatscape();
 		frame.addKeyListener(flatscape);
 		// set the scale of the coordinate system
-		StdDraw.setXscale(-SCALE, SCALE);
-		StdDraw.setYscale(-SCALE, SCALE);
+		StdDraw.setXscale(-SCALE, SCALE);//Sets the maximum X coordinates to the scale, with 0 being the center
+		StdDraw.setYscale(-SCALE, SCALE);//Same but with Y coordinates
 		
 		startMenu(flatscape);
 	}
@@ -86,9 +86,15 @@ public class Flatscape implements KeyListener{
 	}
 	
 	private static void drawCursor() {
-		// changes angle on character (Stolen from tim's program)
 		double TriAngle = Math.toDegrees(Math.atan((StdDraw.mouseY() - ry)/(StdDraw.mouseX() - rx))) - 90;
-		if (StdDraw.mouseX() < rx) TriAngle = TriAngle - 180;
+		if (StdDraw.mouseX() < rx) {
+			TriAngle = TriAngle * -1;
+			if(TriAngle > 90) {
+				TriAngle = 90 - (TriAngle - 90);
+			} else {
+				TriAngle = 180 - TriAngle;
+			}
+		}
 		
 		rx = rx + vx;
 		ry = ry + vy;
@@ -102,6 +108,7 @@ public class Flatscape implements KeyListener{
 		// draw character on the screen
 		StdDraw.setPenColor(StdDraw.BLUE);
 		StdDraw.picture(rx, ry, "Triangle.png", 10, 10, TriAngle);
+		System.out.println("" + TriAngle);
 	}
 	
 	public static void hitDetect() {
@@ -215,10 +222,10 @@ public class Flatscape implements KeyListener{
 					addBullet();					
 				}
 			}			
-			if(currentMeteorDelay <= 0) {
+			/*if(currentMeteorDelay <= 0) {
 				currentMeteorDelay = METEOR_DELAY;
 				enemies.add(new Meteor());
-			}
+			}*/
 
 			drawBullets();			
 			for(Enemy enemy : enemies) {

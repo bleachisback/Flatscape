@@ -132,7 +132,7 @@ public class Meteor extends Enemy{
 		StdDraw.polygon(pointsX, pointsY);*/
 	}
 	
-	public void move(double scale) {
+	public void physics(double scale) {
 		this.position.x += velocity.x * scale;
 		this.position.y += velocity.y * scale;
 		if(Math.abs(position.x) >= 300 || Math.abs(position.y) >= 300) {

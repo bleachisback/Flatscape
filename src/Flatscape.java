@@ -8,12 +8,13 @@ import javax.swing.JFrame;
 
 public class Flatscape implements KeyListener{ 
 	
-	private static ArrayList<Point> bp = new ArrayList<Point>();// position (bullets). Needs to be added to projectile class
-	private static ArrayList<Point> bv = new ArrayList<Point>();// velocity (bullets). Needs to be added to projectile class
-	private static ArrayList<Point> bulletRemoval = new ArrayList<Point>();
+	private static ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	private static ArrayList<Bullet> bulletRemoval = new ArrayList<Bullet>();
+	private static ArrayList<Drawable> drawables = new ArrayList<Drawable>();
 	private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private static ArrayList<Enemy> enemyAddition = new ArrayList<Enemy>();
 	private static ArrayList<Enemy> enemyRemoval = new ArrayList<Enemy>();
+	private static ArrayList<Physicsable> physics = new ArrayList<Physicsable>();//Array of objects that need to have physics applied to them every frame
 	private static double rx  = 48, ry = 86;// position (character). Needs to be added to player class.
 	private static double vx = 1.5, vy = 02.3;// velocity (character). Needs to be added to player class.
 	
@@ -48,12 +49,6 @@ public class Flatscape implements KeyListener{
 		startMenu(flatscape);
 	}
 	
-	private static void addBullet() {
-		FMath.playSound("Laser_Shoot0");
-		bv.add(FMath.smallerHypot(StdDraw.mouseX() - rx, StdDraw.mouseY() - ry, BULLET_SPEED)); //velocity is equal to BULLET_SPEED in the direction of the mouse pointer in relation to the character
-		bp.add(new Point(rx, ry)); //initial position of bullet is equal to position of character
-	}
-	
 	public static void addEnemy(Enemy enemy) {
 		enemyAddition.add(enemy);
 	}
@@ -61,28 +56,6 @@ public class Flatscape implements KeyListener{
 	public void addKeySequence(int[] keys, Runnable runnable) {
 		keySequenceProgress.put(keys, 0);
 		keySequenceRunnable.put(keys, runnable);
-	}
-	
-	//Every frame, draw every bullet and advance their position
-	private static void drawBullets(double scale) {
-		StdDraw.setPenColor(StdDraw.YELLOW);
-		
-		Point[] posArray = bp.toArray(new Point[0]);
-		Point[] velArray = bv.toArray(new Point[0]);
-		bp.clear();
-		bv.clear();
-		for(int i = 0;i < posArray.length; i++) {
-			Point bPos = posArray[i];
-			Point bVelocity = velArray[i];
-			if (Math.abs(bPos.x) >= 107.5 || Math.abs(bPos.y) >= 107.5) { 
-				continue;
-			}				
-			bPos.x = bPos.x + bVelocity.x * scale;
-			bPos.y = bPos.y + bVelocity.y * scale;
-			StdDraw.filledCircle(bPos.x, bPos.y, .9);
-			bp.add(bPos);
-			bv.add(bVelocity);
-		}
 	}
 	
 	private static void drawCursor(double scale) {
@@ -110,9 +83,9 @@ public class Flatscape implements KeyListener{
 				FMath.playSound("Game_Over");
 				return;
 			}
-			for(Point point : bp) {
-				if(enemy.detectHit(point)) {
-					removeBullet(point);
+			for(Bullet bullet : bullets) {
+				if(enemy.detectHit(bullet.position)) {
+					removeBullet(bullet);
 					enemy.onHit();
 					continue loop;
 				}
@@ -140,8 +113,8 @@ public class Flatscape implements KeyListener{
 		}
 	}
 	
-	public static void removeBullet(Point point) {
-		bulletRemoval.add(point);
+	public static void removeBullet(Bullet bullet) {
+		bulletRemoval.add(bullet);
 	}
 	
 	public static void removeEnemy(Enemy enemy) {
@@ -149,16 +122,21 @@ public class Flatscape implements KeyListener{
 	}
 	
 	private static void removeEnemies() {
-		for(Point point : bulletRemoval) {
-			if(!bp.contains(point)) continue;
-			bv.remove(bp.indexOf(point));
-			bp.remove(point);
+		for(Bullet bullet : bulletRemoval) {
+			if(!bullets.contains(bullet)) continue;
+			bullets.remove(bullet);
+			drawables.remove(bullet);
+			physics.remove(bullet);
 		}
 		for(Enemy enemy : enemyAddition) {
 			enemies.add(enemy);
+			drawables.add(enemy);
+			physics.add(enemy);
 		}
 		for(Enemy enemy : enemyRemoval) {
 			enemies.remove(enemy);
+			drawables.remove(enemy);
+			physics.remove(enemy);
 		}
 		bulletRemoval.clear();
 		enemyAddition.clear();
@@ -216,23 +194,31 @@ public class Flatscape implements KeyListener{
 			if(currentBulletDelay <= 0) {				
 				if(StdDraw.mousePressed()) {
 					currentBulletDelay = BULLET_DELAY + currentBulletDelay;
-					addBullet();					
+					FMath.playSound("Laser_Shoot0");
+					//velocity is equal to BULLET_SPEED in the direction of the mouse pointer in relation to the character
+					Bullet bullet = new Bullet(new Point(rx, ry), FMath.smallerHypot(StdDraw.mouseX() - rx, StdDraw.mouseY() - ry, BULLET_SPEED), 1);
+					bullets.add(bullet);
+					drawables.add(bullet);
+					physics.add(bullet);
+					
 				} else currentBulletDelay = 0;				
 			}			
 			if(currentMeteorDelay <= 0) {
 				currentMeteorDelay = METEOR_DELAY + currentMeteorDelay;
-				enemies.add(new Meteor());
+				addEnemy(new Meteor());
 			}
-
-			drawBullets(scale);			
 			for(Enemy enemy : enemies) {
 				if(enemy == null) {
 					removeEnemy(enemy);
 					continue;
 				}
-				enemy.draw();
-				enemy.move(scale);
-			}			
+			}
+			for(Physicsable phys : physics) {
+				phys.physics(scale);
+			}
+			for(Drawable draw : drawables) {
+				draw.draw();
+			}
 			
 			if(currentBulletDelay > 0) currentBulletDelay -= passed;
 			if(currentMeteorDelay > 0) currentMeteorDelay -= passed;

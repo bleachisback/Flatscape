@@ -87,14 +87,7 @@ public class Flatscape implements KeyListener{
 	
 	private static void drawCursor() {
 		double TriAngle = Math.toDegrees(Math.atan((StdDraw.mouseY() - ry)/(StdDraw.mouseX() - rx))) - 90;
-		if (StdDraw.mouseX() < rx) {
-			TriAngle = TriAngle * -1;
-			if(TriAngle > 90) {
-				TriAngle = 90 - (TriAngle - 90);
-			} else {
-				TriAngle = 180 - TriAngle;
-			}
-		}
+		if (StdDraw.mouseX() < rx) TriAngle -= 180;
 		
 		rx = rx + vx;
 		ry = ry + vy;
@@ -222,10 +215,10 @@ public class Flatscape implements KeyListener{
 					addBullet();					
 				}
 			}			
-			/*if(currentMeteorDelay <= 0) {
+			if(currentMeteorDelay <= 0) {
 				currentMeteorDelay = METEOR_DELAY;
 				enemies.add(new Meteor());
-			}*/
+			}
 
 			drawBullets();			
 			for(Enemy enemy : enemies) {

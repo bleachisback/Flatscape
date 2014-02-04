@@ -30,7 +30,7 @@ public class Meteor extends Enemy{
 	}
 	
 	public Meteor(Color color, Point pos, Point velocity, double size) {
-		this(color, pos, velocity, size, Math.random() * 30 - 15);
+		this(color, pos, velocity, size, Math.random() * 5 - 2.5);
 	}
 	
 	public Meteor(Color color, Point pos, Point velocity, double size, double rotation) {
@@ -113,6 +113,19 @@ public class Meteor extends Enemy{
 				}
 			}
 		}
+		//Center the meteor
+		int x = 0;
+		int y = 0;
+		for(Point point: points) {
+			x += point.x;
+			y += point.y;
+		}
+		x /= points.length;
+		y /= points.length;
+		for(Point point: points) {
+			point.x -= x;
+			point.y -= y;
+		}
 		/*System.out.println("- - - - - - - - - - -");
 		StdDraw.polygon(pointsX, pointsY);*/
 	}
@@ -123,7 +136,7 @@ public class Meteor extends Enemy{
 		if(Math.abs(position.x) >= 300 || Math.abs(position.y) >= 300) {
 			remove();
 		}
-		//rotate(rotation);
+		rotate(rotation);
 	}
 	
 	public void onHit() {
@@ -168,10 +181,12 @@ public class Meteor extends Enemy{
 		return new Point(position.x + FMath.randomNegative(Math.random() * 5 + 5), position.y + FMath.randomNegative(Math.random() * 5 + 5));
 	}
 	
-	private void rotate(double rotation) {
+	public void rotate(double rotation) {
 		for(Point point : points) {
-			double angle = Math.toDegrees(Math.atan((point.x - position.x) / (point.y - position.y)));
-			
+			double x = point.x * Math.cos(Math.toRadians(rotation)) + point.y * Math.sin(Math.toRadians(rotation));
+			double y = -point.x * Math.sin(Math.toRadians(rotation)) + point.y * Math.cos(Math.toRadians(rotation));
+			point.x = x;
+			point.y = y;
 		}
 	}
 	

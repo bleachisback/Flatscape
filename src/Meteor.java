@@ -105,6 +105,8 @@ public class Meteor extends Enemy{
 			System.out.println(Math.sin(tempDegrees));
 			StdDraw.filledCircle(pointsX[i], pointsY[i], 0.9);*/
 		}
+		//Check for any intersecting lines
+		//If any lines intersect, remake meteor
 		for(int i = 2; i < POINTS; i++) {
 			for(int j = i - 1; j > 0 ; j--) {
 				if(FMath.doIntersect(points[i], points[(i + 1) % POINTS], points[j], points[j - 1])) {
@@ -130,13 +132,13 @@ public class Meteor extends Enemy{
 		StdDraw.polygon(pointsX, pointsY);*/
 	}
 	
-	public void move() {
-		this.position.x += velocity.x;
-		this.position.y += velocity.y;
+	public void move(double scale) {
+		this.position.x += velocity.x * scale;
+		this.position.y += velocity.y * scale;
 		if(Math.abs(position.x) >= 300 || Math.abs(position.y) >= 300) {
 			remove();
 		}
-		rotate(rotation);
+		rotate(rotation * scale);
 	}
 	
 	public void onHit() {

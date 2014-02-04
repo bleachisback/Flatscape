@@ -18,9 +18,9 @@ public class Flatscape implements KeyListener{
 	private static double vx = 1.5, vy = 02.3;// velocity (character). Needs to be added to player class.
 	
 	public static final double BULLET_SPEED = 1.75;//The distance the bullet travels, per frame
-	public static final int BULLET_DELAY = 15;//The number of frames in between shots. Needs to be changed to ms.
+	public static final int BULLET_DELAY = 300;//The number of milliseconds in between shots.
 	public static final double INFINITY = 150;//"Infinity" for use of line hit-detection.
-	public static final int METEOR_DELAY = 86; //The number of frames in between meteor spawns. Needs to be changed to ms and given a range.
+	public static final int METEOR_DELAY = 860; //The number of milliseconds in between meteor spawns. Needs to be given a range.
 	public static final double SCALE = 100;//The maximum and minimum screen boundaries.
 	public static final double SHIP_SPEED = 1.5;//The number of units the ship moves per frame.
 	
@@ -64,7 +64,7 @@ public class Flatscape implements KeyListener{
 	}
 	
 	//Every frame, draw every bullet and advance their position
-	private static void drawBullets() {
+	private static void drawBullets(double scale) {
 		StdDraw.setPenColor(StdDraw.YELLOW);
 		
 		Point[] posArray = bp.toArray(new Point[0]);
@@ -77,20 +77,20 @@ public class Flatscape implements KeyListener{
 			if (Math.abs(bPos.x) >= 107.5 || Math.abs(bPos.y) >= 107.5) { 
 				continue;
 			}				
-			bPos.x = bPos.x + bVelocity.x;
-			bPos.y = bPos.y + bVelocity.y;
+			bPos.x = bPos.x + bVelocity.x * scale;
+			bPos.y = bPos.y + bVelocity.y * scale;
 			StdDraw.filledCircle(bPos.x, bPos.y, .9);
 			bp.add(bPos);
 			bv.add(bVelocity);
 		}
 	}
 	
-	private static void drawCursor() {
+	private static void drawCursor(double scale) {
 		double TriAngle = Math.toDegrees(Math.atan((StdDraw.mouseY() - ry)/(StdDraw.mouseX() - rx))) - 90;
 		if (StdDraw.mouseX() < rx) TriAngle -= 180;
 		
-		rx = rx + vx;
-		ry = ry + vy;
+		rx = rx + vx * scale;
+		ry = ry + vy * scale;
 		rx = rx > SCALE ? SCALE : rx < -SCALE ? -SCALE : rx;
 		ry = ry > SCALE ? SCALE : ry < -SCALE ? -SCALE : ry;
 
@@ -101,7 +101,6 @@ public class Flatscape implements KeyListener{
 		// draw character on the screen
 		StdDraw.setPenColor(StdDraw.BLUE);
 		StdDraw.picture(rx, ry, "Triangle.png", 10, 10, TriAngle);
-		System.out.println("" + TriAngle);
 	}
 	
 	public static void hitDetect() {
@@ -197,45 +196,50 @@ public class Flatscape implements KeyListener{
 		int currentBulletDelay = 0;
 		int currentMeteorDelay = METEOR_DELAY;
 		
-		//long time = System.currentTimeMillis();
+		long time = System.currentTimeMillis();
+		double passed = 0;
+		double scale = 1;
 		//int frames = 0;
 
 		// main animation loop		
 		while (!gameOver)  {			
 			StdDraw.picture(0,0, "Background.png", 500, 500);
 			keyboard();
-			if(stop) continue;
-			drawCursor();
-			removeEnemies();			
+			if(stop) continue;			
+			removeEnemies();
 
-			if(currentBulletDelay <= 0) {
-				currentBulletDelay = 0;
+			passed = System.currentTimeMillis() - time;
+			time = System.currentTimeMillis();
+			scale = passed / 10;
+			
+			drawCursor(scale);
+			if(currentBulletDelay <= 0) {				
 				if(StdDraw.mousePressed()) {
-					currentBulletDelay = BULLET_DELAY;
+					currentBulletDelay = BULLET_DELAY + currentBulletDelay;
 					addBullet();					
-				}
+				} else currentBulletDelay = 0;				
 			}			
 			if(currentMeteorDelay <= 0) {
-				currentMeteorDelay = METEOR_DELAY;
+				currentMeteorDelay = METEOR_DELAY + currentMeteorDelay;
 				enemies.add(new Meteor());
 			}
 
-			drawBullets();			
+			drawBullets(scale);			
 			for(Enemy enemy : enemies) {
 				if(enemy == null) {
 					removeEnemy(enemy);
 					continue;
 				}
 				enemy.draw();
-				enemy.move();
+				enemy.move(scale);
 			}			
 			
-			currentBulletDelay--;
-			currentMeteorDelay--;
+			if(currentBulletDelay > 0) currentBulletDelay -= passed;
+			if(currentMeteorDelay > 0) currentMeteorDelay -= passed;
 			
 			hitDetect();
-			StdDraw.show(0);						
-			
+			StdDraw.show(0);
+						
 			/*if(System.currentTimeMillis() >= time + 1000) {
 				System.out.println(frames);
 				time = System.currentTimeMillis();

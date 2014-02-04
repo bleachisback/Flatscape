@@ -4,7 +4,7 @@ public abstract class Enemy implements MeteorHitable, Drawable {
 	public Point velocity;
 	
 	public abstract boolean detectHit(Point point);
-	public abstract void move();	
+	public abstract void move(double scale);	
 	
 	public abstract void onHit();
 	

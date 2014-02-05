@@ -12,6 +12,10 @@ public class Point {
 		return new Point(x + point.x, y + point.y);
 	}
 	
+	public Point clone() {
+		return new Point(x, y);
+	}
+	
 	public Point deviate(double deviation, double max) {
 		x += Math.random() * (deviation * 2) - deviation;
 		y += Math.random() * (deviation * 2) - deviation;

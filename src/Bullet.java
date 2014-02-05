@@ -2,6 +2,7 @@
 public class Bullet extends Projectile {
 
 	public Bullet(Point position, Point velocity, int damage) {
+		this.acceleration = new Point(0, 0);
 		this.position = position;
 		this.velocity = velocity;
 		this.damage = damage;
@@ -13,11 +14,10 @@ public class Bullet extends Projectile {
 	}
 
 	public void physics(double scale) {
+		super.physics(scale);
 		if (Math.abs(position.x) >= 107.5 || Math.abs(position.y) >= 107.5) { 
 			Flatscape.removeBullet(this);
-		}				
-		position.x = position.x + velocity.x * scale;
-		position.y = position.y + velocity.y * scale;
+		}
 	}
 
 }

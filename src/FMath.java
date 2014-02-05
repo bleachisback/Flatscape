@@ -128,7 +128,17 @@ public class FMath {
 	
 	public static Point smallerHypot(double adj, double opp, double targetHypot) {
 		double angle = Math.atan(opp / adj);
-		Point returnee = new Point(Math.cos(angle) * targetHypot * (adj / Math.abs(adj)), Math.sin(angle) * targetHypot * (adj / Math.abs(adj)));
+		double negative = 1;
+		if(adj == 0) {
+			if(opp == 0) {
+				return new Point(0, 0);
+			} else {
+				negative = opp / Math.abs(opp);
+			}
+		} else {
+			negative = adj / Math.abs(adj);
+		}
+		Point returnee = new Point(Math.cos(angle) * targetHypot * negative, Math.sin(angle) * targetHypot * negative);
 		return returnee;
 	}
 }

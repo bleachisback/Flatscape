@@ -1,10 +1,6 @@
 
-public abstract class Enemy implements MeteorHitable, Drawable, Physicsable {
-	public Point position;
-	public Point velocity;
-	
+public abstract class Enemy extends Physicsable implements MeteorHitable, Drawable {	
 	public abstract boolean detectHit(Point point);
-	public abstract void physics(double scale);	
 	
 	public abstract void onHit();
 	

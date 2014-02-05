@@ -6,24 +6,24 @@ import java.util.HashMap;
 
 import javax.swing.JFrame;
 
-public class Flatscape implements KeyListener{ 
+public class Flatscape implements KeyListener { 
 	
-	private static ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	public static ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	private static ArrayList<Bullet> bulletRemoval = new ArrayList<Bullet>();
 	private static ArrayList<Drawable> drawables = new ArrayList<Drawable>();
-	private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	public static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private static ArrayList<Enemy> enemyAddition = new ArrayList<Enemy>();
 	private static ArrayList<Enemy> enemyRemoval = new ArrayList<Enemy>();
-	private static ArrayList<Physicsable> physics = new ArrayList<Physicsable>();//Array of objects that need to have physics applied to them every frame
-	private static double rx  = 48, ry = 86;// position (character). Needs to be added to player class.
-	private static double vx = 1.5, vy = 02.3;// velocity (character). Needs to be added to player class.
+	public static ArrayList<Physicsable> physics = new ArrayList<Physicsable>();//Array of objects that need to have physics applied to them every frame
+
+	public static Player player = null;
 	
 	public static final double BULLET_SPEED = 1.75;//The distance the bullet travels, per frame
 	public static final int BULLET_DELAY = 300;//The number of milliseconds in between shots.
 	public static final double INFINITY = 150;//"Infinity" for use of line hit-detection.
 	public static final int METEOR_DELAY = 860; //The number of milliseconds in between meteor spawns. Needs to be given a range.
 	public static final double SCALE = 100;//The maximum and minimum screen boundaries.
-	public static final double SHIP_SPEED = 1.5;//The number of units the ship moves per frame.
+	public static final double SHIP_SPEED = .015;//The number of units the ship moves per frame.
 	
 	public static boolean gameOver = false;
 	public static boolean stop = false;
@@ -58,27 +58,9 @@ public class Flatscape implements KeyListener{
 		keySequenceRunnable.put(keys, runnable);
 	}
 	
-	private static void drawCursor(double scale) {
-		double TriAngle = Math.toDegrees(Math.atan((StdDraw.mouseY() - ry)/(StdDraw.mouseX() - rx))) - 90;
-		if (StdDraw.mouseX() < rx) TriAngle -= 180;
-		
-		rx = rx + vx * scale;
-		ry = ry + vy * scale;
-		rx = rx > SCALE ? SCALE : rx < -SCALE ? -SCALE : rx;
-		ry = ry > SCALE ? SCALE : ry < -SCALE ? -SCALE : ry;
-
-		// Target drawn
-		StdDraw.setPenColor(StdDraw.RED);
-		StdDraw.circle(StdDraw.mouseX(), StdDraw.mouseY(), 5);
-
-		// draw character on the screen
-		StdDraw.setPenColor(StdDraw.BLUE);
-		StdDraw.picture(rx, ry, "Triangle.png", 10, 10, TriAngle);
-	}
-	
 	public static void hitDetect() {
 		loop: for(Enemy enemy : enemies) {
-			if(enemy.detectHit(new Point(rx, ry))) {
+			if(enemy.detectHit(player.position)) {
 				gameOver = true;
 				FMath.playSound("Game_Over");
 				return;
@@ -101,15 +83,27 @@ public class Flatscape implements KeyListener{
 	}
 	
 	private static void keyboard() {
-		vx = vy = 0;
+		player.acceleration.x = player.acceleration.y = 0;
+		Point point = FMath.smallerHypot(StdDraw.mouseX() - player.position.x, StdDraw.mouseY() - player.position.y, SHIP_SPEED);
+		double angle = 0;
 		if(StdDraw.isKeyPressed(KeyEvent.VK_W)) {
-			vy += SHIP_SPEED;
+			player.acceleration.x += point.x;
+			player.acceleration.y += point.y;
 		} if(StdDraw.isKeyPressed(KeyEvent.VK_A)) {
-			vx -= SHIP_SPEED;
+			angle = player.rotation - 90;
+			if(angle < 0) angle += 360;
+			angle = Math.toRadians(angle);
+			player.acceleration.x += SHIP_SPEED * Math.sin(angle);
+			player.acceleration.y += SHIP_SPEED * Math.cos(angle);
 		} if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
-			vy -= SHIP_SPEED;
+			player.acceleration.x -= point.x;
+			player.acceleration.y -= point.y;
 		} if(StdDraw.isKeyPressed(KeyEvent.VK_D)) {
-			vx += SHIP_SPEED;
+			angle = player.rotation - 270;
+			if(angle < 0) angle += 360;
+			angle = Math.toRadians(angle);
+			player.acceleration.x += SHIP_SPEED * Math.sin(angle);
+			player.acceleration.y += SHIP_SPEED * Math.cos(angle);
 		}
 	}
 	
@@ -146,6 +140,7 @@ public class Flatscape implements KeyListener{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+			System.out.println("STAHP");
 			stop = !stop;
 		}
 		for(int[] keys : keySequenceProgress.keySet()) {
@@ -171,6 +166,10 @@ public class Flatscape implements KeyListener{
 	public void keyTyped(KeyEvent arg0) {}
 	
 	public static void startGame() {
+		player = new Player(new Point(0, 0));
+		drawables.add(player);
+		physics.add(player);
+		
 		int currentBulletDelay = 0;
 		int currentMeteorDelay = METEOR_DELAY;
 		
@@ -181,7 +180,7 @@ public class Flatscape implements KeyListener{
 
 		// main animation loop		
 		while (!gameOver)  {			
-			StdDraw.picture(0,0, "Background.png", 500, 500);
+			StdDraw.picture(0, 0, "Background.png", 500, 500);
 			keyboard();
 			if(stop) continue;			
 			removeEnemies();
@@ -190,13 +189,12 @@ public class Flatscape implements KeyListener{
 			time = System.currentTimeMillis();
 			scale = passed / 10;
 			
-			drawCursor(scale);
 			if(currentBulletDelay <= 0) {				
 				if(StdDraw.mousePressed()) {
 					currentBulletDelay = BULLET_DELAY + currentBulletDelay;
 					FMath.playSound("Laser_Shoot0");
 					//velocity is equal to BULLET_SPEED in the direction of the mouse pointer in relation to the character
-					Bullet bullet = new Bullet(new Point(rx, ry), FMath.smallerHypot(StdDraw.mouseX() - rx, StdDraw.mouseY() - ry, BULLET_SPEED), 1);
+					Bullet bullet = new Bullet(player.position.clone() , FMath.smallerHypot(StdDraw.mouseX() - player.position.x, StdDraw.mouseY() - player.position.y, BULLET_SPEED), 1);
 					bullets.add(bullet);
 					drawables.add(bullet);
 					physics.add(bullet);
@@ -225,7 +223,6 @@ public class Flatscape implements KeyListener{
 			
 			hitDetect();
 			StdDraw.show(0);
-						
 			/*if(System.currentTimeMillis() >= time + 1000) {
 				System.out.println(frames);
 				time = System.currentTimeMillis();

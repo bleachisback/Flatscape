@@ -2,7 +2,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 
-public class Meteor extends Enemy{
+public class Meteor extends Enemy {
+	
 	public static final Color[] COLORS = {Color.PINK, Color.GREEN, Color.WHITE, Color.RED};
 	public static final double MAX_SPEED = 0.75;
 	public static final int POINTS = 5;
@@ -34,6 +35,7 @@ public class Meteor extends Enemy{
 	}
 	
 	public Meteor(Color color, Point pos, Point velocity, double size, double rotation) {
+		this.acceleration = new Point(0, 0);
 		this.color = color;
 		this.velocity = velocity;
 		this.position = pos;
@@ -133,8 +135,7 @@ public class Meteor extends Enemy{
 	}
 	
 	public void physics(double scale) {
-		this.position.x += velocity.x * scale;
-		this.position.y += velocity.y * scale;
+		super.physics(scale);
 		if(Math.abs(position.x) >= 300 || Math.abs(position.y) >= 300) {
 			remove();
 		}

@@ -9,7 +9,9 @@ public class Point {
 	}
 	
 	public Point add(Point point) {
-		return new Point(x + point.x, y + point.y);
+		x += point.x;
+		y += point.y;
+		return this;
 	}
 	
 	public Point clone() {
@@ -31,8 +33,14 @@ public class Point {
 		return false;
 	}
 	
+	public Point subtract(Point point) {
+		x -= point.x;
+		y -= point.y;
+		return this;		
+	}
+	
 	@Override
 	public String toString() {
-		return x+", "+y;
-	}
+		return x + ", " + y;
+	}	
 }

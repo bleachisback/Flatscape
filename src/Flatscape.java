@@ -8,13 +8,15 @@ import javax.swing.JFrame;
 
 public class Flatscape implements KeyListener { 
 	
-	public static ArrayList<Bullet> bullets = new ArrayList<Bullet>();
-	private static ArrayList<Bullet> bulletRemoval = new ArrayList<Bullet>();
-	private static ArrayList<Drawable> drawables = new ArrayList<Drawable>();
-	public static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-	private static ArrayList<Enemy> enemyAddition = new ArrayList<Enemy>();
-	private static ArrayList<Enemy> enemyRemoval = new ArrayList<Enemy>();
-	public static ArrayList<Physicsable> physics = new ArrayList<Physicsable>();//Array of objects that need to have physics applied to them every frame
+	public static ArrayList<ProjectileBullet> bullets = new ArrayList<ProjectileBullet>();
+	//private static ArrayList<ProjectileBullet> bulletRemoval = new ArrayList<ProjectileBullet>();
+	public static ArrayList<Drawable> drawables = new ArrayList<Drawable>();
+	
+	private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	public static HashMap<Enemy, Boolean> enemyAddition = new HashMap<Enemy, Boolean>();
+	
+	private static ArrayList<Physicsable> physics = new ArrayList<Physicsable>();//Array of objects that need to have physics applied to them every frame
+	public static HashMap<Physicsable, Boolean> physicsAddition = new HashMap<Physicsable, Boolean>();
 
 	public static Player player = null;
 	
@@ -49,15 +51,12 @@ public class Flatscape implements KeyListener {
 		startMenu(flatscape);
 	}
 	
-	public static void addEnemy(Enemy enemy) {
-		enemyAddition.add(enemy);
-	}
-	
 	public void addKeySequence(int[] keys, Runnable runnable) {
 		keySequenceProgress.put(keys, 0);
 		keySequenceRunnable.put(keys, runnable);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static void hitDetect() {
 		loop: for(Enemy enemy : enemies) {
 			if(enemy.detectHit(player.position)) {
@@ -65,9 +64,11 @@ public class Flatscape implements KeyListener {
 				FMath.playSound("Game_Over");
 				return;
 			}
-			for(Bullet bullet : bullets) {
+			for(ProjectileBullet bullet : (ArrayList<ProjectileBullet>) bullets.clone()) {
 				if(enemy.detectHit(bullet.position)) {
-					removeBullet(bullet);
+					drawables.remove(bullet);
+					physicsAddition.put(bullet, false);
+					bullets.remove(bullet);
 					enemy.onHit();
 					continue loop;
 				}
@@ -87,54 +88,40 @@ public class Flatscape implements KeyListener {
 		Point point = FMath.smallerHypot(StdDraw.mouseX() - player.position.x, StdDraw.mouseY() - player.position.y, SHIP_SPEED);
 		double angle = 0;
 		if(StdDraw.isKeyPressed(KeyEvent.VK_W)) {
-			player.acceleration.x += point.x;
-			player.acceleration.y += point.y;
+			player.acceleration.add(point);
 		} if(StdDraw.isKeyPressed(KeyEvent.VK_A)) {
 			angle = player.rotation - 90;
 			if(angle < 0) angle += 360;
-			angle = Math.toRadians(angle);
-			player.acceleration.x += SHIP_SPEED / 2.5 * Math.sin(angle);
-			player.acceleration.y += SHIP_SPEED / 2.5 * Math.cos(angle);
+			player.acceleration.add(FMath.circlePoint(SHIP_SPEED / 2.5, angle));
 		} if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
-			player.acceleration.x -= point.x;
-			player.acceleration.y -= point.y;
+			player.acceleration.subtract(point);
 		} if(StdDraw.isKeyPressed(KeyEvent.VK_D)) {
 			angle = player.rotation - 270;
 			if(angle < 0) angle += 360;
-			angle = Math.toRadians(angle);
-			player.acceleration.x += SHIP_SPEED / 2.5 * Math.sin(angle);
-			player.acceleration.y += SHIP_SPEED / 2.5 * Math.cos(angle);
+			player.acceleration.add(FMath.circlePoint(SHIP_SPEED / 2.5, angle));
 		}
-	}
-	
-	public static void removeBullet(Bullet bullet) {
-		bulletRemoval.add(bullet);
-	}
-	
-	public static void removeEnemy(Enemy enemy) {
-		enemyRemoval.add(enemy);
 	}
 	
 	private static void removeEnemies() {
-		for(Bullet bullet : bulletRemoval) {
-			if(!bullets.contains(bullet)) continue;
-			bullets.remove(bullet);
-			drawables.remove(bullet);
-			physics.remove(bullet);
+		for(Enemy enemy : enemyAddition.keySet()) {
+			if(enemyAddition.get(enemy)) {
+				enemies.add(enemy);
+				drawables.add(enemy);
+				physics.add(enemy);
+			} else {
+				enemies.remove(enemy);
+				drawables.remove(enemy);
+				physics.remove(enemy);
+			}
+		}		
+		for(Physicsable physic : physicsAddition.keySet()) {
+			if(physicsAddition.get(physic)) {
+				physics.add(physic);
+			} else {
+				physics.remove(physic);
+			}
 		}
-		for(Enemy enemy : enemyAddition) {
-			enemies.add(enemy);
-			drawables.add(enemy);
-			physics.add(enemy);
-		}
-		for(Enemy enemy : enemyRemoval) {
-			enemies.remove(enemy);
-			drawables.remove(enemy);
-			physics.remove(enemy);
-		}
-		bulletRemoval.clear();
 		enemyAddition.clear();
-		enemyRemoval.clear();		
 	}
 		
 	@Override
@@ -183,37 +170,27 @@ public class Flatscape implements KeyListener {
 			StdDraw.picture(0, 0, "Background.png", 500, 500);
 			keyboard();
 			if(stop) continue;			
-			removeEnemies();
+			removeEnemies();			
 
 			passed = System.currentTimeMillis() - time;
 			time = System.currentTimeMillis();
 			scale = passed / 10;
-			
-			if(currentBulletDelay <= 0) {				
-				if(StdDraw.mousePressed()) {
-					currentBulletDelay = BULLET_DELAY + currentBulletDelay;
-					FMath.playSound("Laser_Shoot0");
-					//velocity is equal to BULLET_SPEED in the direction of the mouse pointer in relation to the character
-					Bullet bullet = new Bullet(player.position.clone() , FMath.smallerHypot(StdDraw.mouseX() - player.position.x, StdDraw.mouseY() - player.position.y, BULLET_SPEED), 1);
-					bullets.add(bullet);
-					drawables.add(bullet);
-					physics.add(bullet);
 					
-				} else currentBulletDelay = 0;				
-			}			
 			if(currentMeteorDelay <= 0) {
 				currentMeteorDelay = METEOR_DELAY + currentMeteorDelay;
-				addEnemy(new Meteor());
+				enemyAddition.put(new Meteor(), true);
 			}
+			
 			for(Enemy enemy : enemies) {
 				if(enemy == null) {
-					removeEnemy(enemy);
+					enemyAddition.put(enemy, false);
 					continue;
 				}
 			}
+			
 			for(Physicsable phys : physics) {
 				phys.physics(scale);
-			}
+			}			
 			for(Drawable draw : drawables) {
 				draw.draw();
 			}
@@ -222,6 +199,7 @@ public class Flatscape implements KeyListener {
 			if(currentMeteorDelay > 0) currentMeteorDelay -= passed;
 			
 			hitDetect();
+			updateBackground();
 			StdDraw.show(0);
 			/*if(System.currentTimeMillis() >= time + 1000) {
 				System.out.println(frames);
@@ -245,5 +223,27 @@ public class Flatscape implements KeyListener {
 			
 		}*/
 		startGame();
+	}
+	
+	public static void updateBackground() {
+		if(player.position.x > SCALE * .9) {			
+			for(Physicsable physics : Flatscape.physics) {
+				physics.position.x -= player.position.x - SCALE * .9;
+			}
+		} else if(player.position.x < -(SCALE * .9)) {			
+			for(Physicsable physics : Flatscape.physics) {
+				physics.position.x -= player.position.x + SCALE * .9;
+			}
+		}
+		
+		if(player.position.y > SCALE * .9) {			
+			for(Physicsable physics : Flatscape.physics) {
+				physics.position.y -= player.position.y - SCALE * .9;
+			}
+		} else if(player.position.y < -(SCALE * .9)) {			
+			for(Physicsable physics : Flatscape.physics) {
+				physics.position.y -= player.position.y + SCALE * .9;
+			}
+		}
 	}
 } 

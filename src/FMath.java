@@ -17,6 +17,10 @@ public class FMath {
 	    return Math.acos((sqr(BC) + sqr(AB) - sqr(AC)) / (2 * BC * AB));
 	}
 	
+	public static Point circlePoint(double length, double angle) {
+		return new Point(length * Math.sin(Math.toRadians(angle)), length * Math.cos(Math.toRadians(angle)));
+	}
+	
 	public static boolean doIntersect(Point p1, Point p2, Point p3, Point p4) {		
 		if(Math.abs(p3.y - p1.y) < Math.abs(p3.y - p2.y)) {
 			Point temp = p1;

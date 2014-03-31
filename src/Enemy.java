@@ -5,6 +5,6 @@ public abstract class Enemy extends Physicsable implements MeteorHitable, Drawab
 	public abstract void onHit();
 	
 	public void remove() {
-		Flatscape.removeEnemy(this);
+		Flatscape.enemyAddition.put(this, false);
 	}
 }

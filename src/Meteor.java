@@ -11,7 +11,6 @@ public class Meteor extends Enemy {
 	public Color color;
 	public ArrayList<Meteor> noHitList = new ArrayList<Meteor>();
 	public Point[] points;
-	public double rotation;
 	public double size;
 	
 	public Meteor() {
@@ -54,7 +53,7 @@ public class Meteor extends Enemy {
 	public Point[] getRealPoints() {
 		Point[] points = new Point[POINTS];
 		for(int i = 0; i < POINTS; i++) {
-			points[i] = this.points[i].add(position);
+			points[i] = this.points[i].clone().add(position);
 		}
 		return points;
 	}
@@ -152,7 +151,7 @@ public class Meteor extends Enemy {
 			Point newVelocity = FMath.smallerHypot(position.x - newPos.x, position.y - newPos.y, MAX_SPEED / 1.5);
 			Meteor _meteor = new Meteor(color, newPos, newVelocity, size / 2);
 			meteors.add(_meteor);
-			Flatscape.addEnemy(_meteor);
+			Flatscape.enemyAddition.put(_meteor, true);
 		}
 		for(Meteor _meteor : meteors) {
 			for(Meteor $meteor : meteors) {

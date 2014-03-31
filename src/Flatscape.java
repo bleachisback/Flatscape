@@ -93,8 +93,8 @@ public class Flatscape implements KeyListener {
 			angle = player.rotation - 90;
 			if(angle < 0) angle += 360;
 			angle = Math.toRadians(angle);
-			player.acceleration.x += SHIP_SPEED * Math.sin(angle);
-			player.acceleration.y += SHIP_SPEED * Math.cos(angle);
+			player.acceleration.x += SHIP_SPEED / 2.5 * Math.sin(angle);
+			player.acceleration.y += SHIP_SPEED / 2.5 * Math.cos(angle);
 		} if(StdDraw.isKeyPressed(KeyEvent.VK_S)) {
 			player.acceleration.x -= point.x;
 			player.acceleration.y -= point.y;
@@ -102,8 +102,8 @@ public class Flatscape implements KeyListener {
 			angle = player.rotation - 270;
 			if(angle < 0) angle += 360;
 			angle = Math.toRadians(angle);
-			player.acceleration.x += SHIP_SPEED * Math.sin(angle);
-			player.acceleration.y += SHIP_SPEED * Math.cos(angle);
+			player.acceleration.x += SHIP_SPEED / 2.5 * Math.sin(angle);
+			player.acceleration.y += SHIP_SPEED / 2.5 * Math.cos(angle);
 		}
 	}
 	

@@ -1,12 +1,11 @@
 
 public class WeaponBullet extends Weapon {
 	
-	public static final int BASE_COOLDOWN = 300;
 	public static final double BULLET_SPEED = 1;
 	public static final double DAMAGE = 15;
 	
-	public WeaponBullet() {
-		super(BASE_COOLDOWN);
+	public WeaponBullet(int baseCooldown) {
+		super(baseCooldown);
 	}
 	
 	@Override

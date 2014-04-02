@@ -19,9 +19,8 @@ public class Flatscape implements KeyListener {
 	public static Player player = null;
 	
 	public static final double BULLET_SPEED = 1.75;//The distance the bullet travels, per frame
-	public static final int BULLET_DELAY = 300;//The number of milliseconds in between shots.
 	public static final double INFINITY = 150;//"Infinity" for use of line hit-detection.
-	public static final int METEOR_DELAY = 860; //The number of milliseconds in between meteor spawns. Needs to be given a range.
+	public static final int ENEMY_DELAY = 1800; //The number of milliseconds in between meteor spawns. Needs to be given a range.
 	public static final double SCALE = 100;//The maximum and minimum screen boundaries.
 	public static final double SHIP_SPEED = .015;//The number of units the ship moves per frame.
 	
@@ -142,8 +141,7 @@ public class Flatscape implements KeyListener {
 		drawables.add(player);
 		physics.add(player);
 		
-		int currentBulletDelay = 0;
-		int currentMeteorDelay = METEOR_DELAY;
+		int currentEnemyDelay = ENEMY_DELAY;
 		
 		long time = System.currentTimeMillis();
 		double passed = 0;
@@ -165,9 +163,13 @@ public class Flatscape implements KeyListener {
 			time = System.currentTimeMillis();
 			scale = passed / 10;
 					
-			if(currentMeteorDelay <= 0) {
-				currentMeteorDelay = METEOR_DELAY + currentMeteorDelay;
-				//enemyAddition.put(new Meteor(), true);
+			if(currentEnemyDelay <= 0) {
+				currentEnemyDelay = ENEMY_DELAY + currentEnemyDelay;
+				if(Math.random() > .25) {
+					enemyAddition.put(new Meteor(), true);
+				} else {
+					enemyAddition.put(new EnemyShip(), true);
+				}
 			}
 			
 			for(Enemy enemy : enemies) {
@@ -184,8 +186,7 @@ public class Flatscape implements KeyListener {
 				draw.draw();
 			}
 			
-			if(currentBulletDelay > 0) currentBulletDelay -= passed;
-			if(currentMeteorDelay > 0) currentMeteorDelay -= passed;
+			if(currentEnemyDelay > 0) currentEnemyDelay -= passed;
 			
 			hitDetect();			
 			StdDraw.show(0);

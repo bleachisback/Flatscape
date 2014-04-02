@@ -2,6 +2,14 @@
 public class EnemyShip extends Enemy {
 	public double health = 20;
 	
+	public EnemyShip() {
+		this(randomWeapon());
+	}
+	
+	public EnemyShip(Weapon[] weapons) {
+		this(weapons, FMath.randomPos());
+	}
+	
 	public EnemyShip(Weapon[] weapons, Point position) {
 		this.weapons = weapons;
 		this.position = position;
@@ -81,6 +89,12 @@ public class EnemyShip extends Enemy {
 				weapon.shoot(this);
 			}
 		}
+	}
+	
+	public static Weapon[] randomWeapon() {
+		Weapon[] weapons = new Weapon[1];
+		weapons[0] = new WeaponBullet(600);
+		return weapons;
 	}
 
 }

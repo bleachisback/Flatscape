@@ -105,6 +105,18 @@ public class FMath {
 			doub *= -1;
 		}
 		return doub;
+	}	
+	
+	public static Point randomPos() {
+		Point point = new Point(0, 0);
+		if(Math.random() > .5) {
+			point.x = FMath.randomNegative(125);
+			point.y = Math.random() * (Flatscape.SCALE * 2) - Flatscape.SCALE;
+		} else {
+			point.x = Math.random() * (Flatscape.SCALE * 2) - Flatscape.SCALE;
+			point.y = FMath.randomNegative(125);
+		}
+		return point;
 	}
 	
 	public static Point smallerHypot(double adj, double opp, double targetHypot) {

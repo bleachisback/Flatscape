@@ -17,7 +17,7 @@ public class Meteor extends Enemy {
 	}
 	
 	public Meteor(Color color) {
-		this(color, Meteor.randomPos());
+		this(color, FMath.randomPos());
 	}
 	
 	public Meteor(Color color, Point pos) {
@@ -154,18 +154,6 @@ public class Meteor extends Enemy {
 				_meteor.hitBy.add($meteor);
 			}
 		}
-	}
-	
-	private static Point randomPos() {
-		Point point = new Point(0, 0);
-		if(Math.random() > .5) {
-			point.x = FMath.randomNegative(125);
-			point.y = Math.random() * (Flatscape.SCALE * 2) - Flatscape.SCALE;
-		} else {
-			point.x = Math.random() * (Flatscape.SCALE * 2) - Flatscape.SCALE;
-			point.y = FMath.randomNegative(125);
-		}
-		return point;
 	}
 	
 	private Point randomRelativePos() {

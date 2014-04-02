@@ -53,7 +53,7 @@ public class Player extends Physicsable implements Drawable{
 		if (StdDraw.mouseX() < position.x) rotation -= 180;
 		rotation *= -1;
 		
-		if(Double.isNaN(rotation)) rotation = 0;		
+		if(Double.isNaN(rotation)) rotation = 0;
 		
 		for(Weapon weapon : weapons) {
 			if(weapon == null) continue;

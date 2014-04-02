@@ -30,5 +30,16 @@ public class EnemyShip extends Enemy {
 			remove();
 		}
 	}
+	
+	@Override
+	public void physics(double scale) {
+		super.physics(scale);
+		
+		rotation = Math.toDegrees(Math.atan((Flatscape.player.position.y - position.y)/(Flatscape.player.position.x - position.x))) - 90;
+		if (Flatscape.player.position.x < position.x) rotation -= 180;
+		rotation *= -1;
+		
+		if(Double.isNaN(rotation)) rotation = 0;
+	}
 
 }

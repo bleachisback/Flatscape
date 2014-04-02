@@ -168,7 +168,7 @@ public class Flatscape implements KeyListener {
 					
 			if(currentMeteorDelay <= 0) {
 				currentMeteorDelay = METEOR_DELAY + currentMeteorDelay;
-				enemyAddition.put(new Meteor(), true);
+				//enemyAddition.put(new Meteor(), true);
 			}
 			
 			for(Enemy enemy : enemies) {
@@ -190,13 +190,6 @@ public class Flatscape implements KeyListener {
 			
 			hitDetect();			
 			StdDraw.show(0);
-			/*if(System.currentTimeMillis() >= time + 1000) {
-				System.out.println(frames);
-				time = System.currentTimeMillis();
-				frames = 0;
-			} else {
-				frames++;
-			}*/
 		} 
 	}
 	

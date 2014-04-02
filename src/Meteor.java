@@ -78,15 +78,7 @@ public class Meteor extends Enemy {
 		double tempDegrees = 0;
 		double length = size + (size / 2);
 		points[0] = new Point(Math.random() * (size - 0.1) + 0.1, Math.random() * (size - 0.1) + 0.1);
-		
-		/*StdDraw.setPenColor(StdDraw.RED);
-		StdDraw.filledCircle(pointsX[0], pointsY[0], 0.9);*/
-		
 		points[1] = new Point(Math.random() * (size * 2) - size, Math.random() * (size - 0.1) - size - 0.1);
-		
-		/*StdDraw.setPenColor(StdDraw.BLUE);
-		StdDraw.filledCircle(pointsX[1], pointsY[1], 0.9);
-		StdDraw.setPenColor(StdDraw.YELLOW);*/
 		
 		for(int i = 2; i < POINTS; i++) {
 			tempDegrees = Math.random() * Math.min(180, degrees - 30);
@@ -102,11 +94,6 @@ public class Meteor extends Enemy {
 			}			
 			
 			degrees -= tempDegrees;
-			
-			/*StdDraw.setPenColor(COLORS[i-2]);
-			System.out.println((i + 1) + ": " + pointsX[i] + ", " + pointsY[i] + ", Degrees: " + tempDegrees + ", Length: " + length);
-			System.out.println(Math.sin(tempDegrees));
-			StdDraw.filledCircle(pointsX[i], pointsY[i], 0.9);*/
 		}
 		//Check for any intersecting lines
 		//If any lines intersect, remake meteor
@@ -131,8 +118,6 @@ public class Meteor extends Enemy {
 			point.x -= x;
 			point.y -= y;
 		}
-		/*System.out.println("- - - - - - - - - - -");
-		StdDraw.polygon(pointsX, pointsY);*/
 	}
 	
 	public void physics(double scale) {

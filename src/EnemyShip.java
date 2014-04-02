@@ -40,6 +40,33 @@ public class EnemyShip extends Enemy {
 		rotation *= -1;
 		
 		if(Double.isNaN(rotation)) rotation = 0;
+		
+		acceleration.x = acceleration.y = 0;
+		Point point = FMath.smallerHypot(Flatscape.player.position.x - position.x, Flatscape.player.position.y - position.y, Flatscape.SHIP_SPEED / 2);		
+		if(position.distance(Flatscape.player.position) >= 65) {
+			acceleration.add(point);
+		} else if(position.distance(Flatscape.player.position) <= 50) {
+			acceleration.subtract(point);
+		} else {
+			acceleration.divide(2);
+			
+			double angle = 0;
+			angle = rotation - 90;
+			if(angle < 0) angle += 360;
+			Point _point = FMath.circlePoint(Flatscape.SHIP_SPEED, angle);
+			
+			if(velocity.clone().distance(_point) <= point.clone().distance(_point)) {
+				acceleration.add(FMath.circlePoint(Flatscape.SHIP_SPEED / 2.5, angle));
+			} else {
+				acceleration.add(FMath.circlePoint(Flatscape.SHIP_SPEED / 2.5, angle + 180));
+			}
+		}
+		if(velocity.distance(new Point(0, 0)) > Flatscape.SHIP_SPEED * 100) {
+			acceleration.subtract(velocity.clone().divide(1.35));
+		}
+		if(acceleration.distance(new Point(0, 0)) > Flatscape.SHIP_SPEED * 3) {
+			acceleration.divide(2);
+		}
 	}
 
 }

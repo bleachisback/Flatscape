@@ -29,6 +29,12 @@ public class Point {
 		return Math.sqrt(FMath.sqr(point.x - x) + FMath.sqr(point.y - y));
 	}
 	
+	public Point divide(double divide) {
+		x /= divide;
+		y /= divide;
+		return this;
+	}
+	
 	@Override
 	public boolean equals(Object object) {
 		if(object instanceof Point) {

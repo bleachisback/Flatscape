@@ -7,10 +7,10 @@ public class Player extends Physicsable implements Drawable{
 		this.position = position;
 		this.velocity = new Point(0, 0);
 		this.rotation = 0;
-		this.health = 30;
+		this.health = 50;
 		this.damage = 100;
 		
-		weapons[0] = new WeaponBullet(this);
+		weapons[0] = new WeaponBullet();
 	}
 	
 	@Override

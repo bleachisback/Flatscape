@@ -19,5 +19,6 @@ public class Weapon {
 	
 	public void shoot(Physicsable shooter) {
 		cooldown = baseCooldown + cooldown;
+		this.owner = shooter;
 	}
 }

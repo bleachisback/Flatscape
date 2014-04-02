@@ -150,9 +150,8 @@ public class Flatscape implements KeyListener {
 		double scale = 1;
 
 		Weapon[] weapons = new Weapon[1];
-		EnemyShip blah = null;		
-		weapons[0] = new WeaponBullet(blah);
-		blah = new EnemyShip(weapons, new Point(50, 50));
+		weapons[0] = new WeaponBullet();
+		EnemyShip blah = new EnemyShip(weapons, new Point(50, 50));
 		enemyAddition.put(blah, true);
 		
 		// main animation loop

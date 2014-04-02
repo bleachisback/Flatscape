@@ -12,6 +12,11 @@ public class EnemyShip extends Enemy {
 
 	@Override
 	public boolean detectHit(Physicsable source) {
+		if(source instanceof Projectile) {
+			if(((Projectile) source).source.owner == this) {
+				return false;
+			}
+		}
 		return source.position.distance(position) < 10 ;
 	}
 	
@@ -27,6 +32,7 @@ public class EnemyShip extends Enemy {
 		health -= source.damage;
 		
 		if(health <= 0) {
+			FMath.playSound("Meteor_Destroy0");
 			remove();
 		}
 	}
@@ -67,6 +73,13 @@ public class EnemyShip extends Enemy {
 		}
 		if(acceleration.distance(new Point(0, 0)) > Flatscape.SHIP_SPEED * 3) {
 			acceleration.divide(2);
+		}
+		
+		for(Weapon weapon : weapons) {
+			weapon.physics(scale);
+			if(weapon.cooldown <= 0) {
+				weapon.shoot(this);
+			}
 		}
 	}
 

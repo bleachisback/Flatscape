@@ -146,18 +146,13 @@ public class Flatscape implements KeyListener {
 		long time = System.currentTimeMillis();
 		double passed = 0;
 		double scale = 1;
-
-		/*Weapon[] weapons = new Weapon[1];
-		weapons[0] = new WeaponBullet();
-		EnemyShip blah = new EnemyShip(weapons, new Point(50, 50));
-		enemyAddition.put(blah, true);*/
 		
 		// main animation loop
 		while (!gameOver)  {			
 			updateBackground();
 			keyboard();
 			if(stop) continue;			
-			removeEnemies();			
+			removeEnemies();
 
 			passed = System.currentTimeMillis() - time;
 			time = System.currentTimeMillis();

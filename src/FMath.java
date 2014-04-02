@@ -35,29 +35,6 @@ public class FMath {
 		if(Math.abs((length(p4, p1) * Math.sin(a)) / Math.sin(c)) > length(p4, p3)) return false;
 		if(Math.abs((length(p4, p1) * Math.sin(b)) / Math.sin(c)) > length(p1, p2)) return false;
 		
-		/*StdDraw.setPenColor(StdDraw.BLUE);
-		StdDraw.filledCircle(p1.x, p1.y, 0.9);
-		StdDraw.line(p4.x, p4.y, p1.x, p1.y);
-		StdDraw.setPenColor(StdDraw.ORANGE);
-		StdDraw.filledCircle(p2.x, p2.y, 1.2);
-		StdDraw.line(p1.x, p1.y, p2.x, p2.y);
-		StdDraw.setPenColor(StdDraw.CYAN);
-		StdDraw.filledCircle(p4.x, p4.y, 0.9);
-		StdDraw.filledCircle(p3.x, p3.y, 0.9);
-		StdDraw.line(p4.x, p4.y, p3.x, p3.y);
-		
-		System.out.println("p1: " + p1);
-		System.out.println("p2: " + p2);
-		System.out.println("p4: " + p4);
-		System.out.println("p3: " + p3);
-		System.out.println("A: " + a + " B: " + b + " C: " + c);
-		System.out.println("A: " + Math.toDegrees(a) + " B: " + Math.toDegrees(b) + " C: " + Math.toDegrees(c));
-		System.out.println("length of a:     " + Math.abs((length(p4, p1) * Math.sin(a)) / Math.sin(c)));
-		System.out.println("length of p4-p3: " + length(p4, p3) + "(Cyan)");
-		System.out.println("length of b:     " + Math.abs((length(p4, p1) * Math.sin(b)) / Math.sin(c)));
-		System.out.println("length of p1-p2: " + length(p1, p2) + "(Orange)");
-		System.out.println("length of c:     " + length(p4, p1) + "(Blue)");
-		System.out.println("---------------------------------");*/
 		return true;
 	}
 	

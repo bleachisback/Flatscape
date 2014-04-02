@@ -25,6 +25,10 @@ public class Point {
 		return FMath.smallerHypot(x, y, max);
 	}
 	
+	public double distance(Point point) {
+		return Math.sqrt(FMath.sqr(point.x - x) + FMath.sqr(point.y - y));
+	}
+	
 	@Override
 	public boolean equals(Object object) {
 		if(object instanceof Point) {

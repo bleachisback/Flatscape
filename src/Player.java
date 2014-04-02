@@ -1,5 +1,5 @@
 
-public class Player extends Physicsable implements Drawable, MeteorHitable, Weaponable {
+public class Player extends Physicsable implements Drawable, Weaponable {
 	private Weapon[] weapons = new Weapon[4];
 	
 	public Player(Point position) {
@@ -7,13 +7,19 @@ public class Player extends Physicsable implements Drawable, MeteorHitable, Weap
 		this.position = position;
 		this.velocity = new Point(0, 0);
 		this.rotation = 0;
+		this.health = 30;
 		
 		weapons[0] = new WeaponBullet();
 	}
 	
+	@Override
+	public boolean detectHit(Point point) {
+		return point.distance(position) <= 10;
+	}
+	
 	public void draw() {
 		//Draw player ship
-		StdDraw.picture(position.x, position.y, "Triangle.png", 10, 10, -rotation);
+		StdDraw.picture(position.x, position.y, "Player.png", 10, 10, -rotation);
 		
 		//Drawing targeting reticule
 		StdDraw.setPenColor(StdDraw.RED);
@@ -23,10 +29,12 @@ public class Player extends Physicsable implements Drawable, MeteorHitable, Weap
 	public Weapon[] getWeapons() {		
 		return weapons;		
 	}
-
-	public void onMeteorHit(Meteor meteor) {
-		meteor.onHit();
-		Flatscape.gameOver = true;
+	
+	@Override
+	public void onHit(double damage, Physicsable source) {
+		if(hitBy.contains(source)) return;
+		this.health -= damage;
+		hitBy.add(source);
 	}
 	
 	public void physics(double scale) {

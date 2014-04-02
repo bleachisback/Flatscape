@@ -1,9 +1,5 @@
 
-public abstract class Enemy extends Physicsable implements MeteorHitable, Drawable {	
-	public abstract boolean detectHit(Point point);
-	
-	public abstract void onHit();
-	
+public abstract class Enemy extends Physicsable implements Drawable {	
 	public void remove() {
 		Flatscape.enemyAddition.put(this, false);
 	}

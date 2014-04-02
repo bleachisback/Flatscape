@@ -9,7 +9,7 @@ public class Meteor extends Enemy {
 	public static final int POINTS = 5;
 	
 	public Color color;
-	public ArrayList<Meteor> noHitList = new ArrayList<Meteor>();
+	public ArrayList<Physicsable> noHitList = new ArrayList<Physicsable>();
 	public Point[] points;
 	public double size;
 	
@@ -40,6 +40,8 @@ public class Meteor extends Enemy {
 		this.position = pos;
 		this.size = size;
 		this.rotation = rotation;
+		this.health = size / 1.5;
+		
 		initialise();
 	}
 	
@@ -141,7 +143,9 @@ public class Meteor extends Enemy {
 		rotate(rotation * scale);
 	}
 	
-	public void onHit() {
+	public void onHit(double damage, Physicsable source) {
+		if(noHitList.contains(source)) return;
+		
 		FMath.playSound("Meteor_Destroy0");
 		remove();
 		if(size < 18) return;
@@ -159,12 +163,6 @@ public class Meteor extends Enemy {
 				_meteor.noHitList.add($meteor);
 			}
 		}
-	}
-	
-	public void onMeteorHit(Meteor meteor) {
-		if(noHitList.contains(meteor)) return;
-		meteor.onHit();
-		onHit();		
 	}
 	
 	private static Point randomPos() {

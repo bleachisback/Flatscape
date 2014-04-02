@@ -8,14 +8,12 @@ import javax.swing.JFrame;
 
 public class Flatscape implements KeyListener { 
 	
-	public static ArrayList<ProjectileBullet> bullets = new ArrayList<ProjectileBullet>();
-	//private static ArrayList<ProjectileBullet> bulletRemoval = new ArrayList<ProjectileBullet>();
 	public static ArrayList<Drawable> drawables = new ArrayList<Drawable>();
 	
-	private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+	public static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	public static HashMap<Enemy, Boolean> enemyAddition = new HashMap<Enemy, Boolean>();
 	
-	private static ArrayList<Physicsable> physics = new ArrayList<Physicsable>();//Array of objects that need to have physics applied to them every frame
+	public static ArrayList<Physicsable> physics = new ArrayList<Physicsable>();//Array of objects that need to have physics applied to them every frame
 	public static HashMap<Physicsable, Boolean> physicsAddition = new HashMap<Physicsable, Boolean>();
 
 	public static Player player = null;
@@ -29,6 +27,8 @@ public class Flatscape implements KeyListener {
 	
 	public static boolean gameOver = false;
 	public static boolean stop = false;
+	
+	private static Point bgOffset = new Point(0, 0);
 	
 	private HashMap<int[], Integer> keySequenceProgress = new HashMap<int[], Integer>();
 	private HashMap<int[], Runnable> keySequenceRunnable = new HashMap<int[], Runnable>();
@@ -56,7 +56,7 @@ public class Flatscape implements KeyListener {
 		keySequenceRunnable.put(keys, runnable);
 	}
 	
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	public static void hitDetect() {
 		loop: for(Enemy enemy : enemies) {
 			if(enemy.detectHit(player.position)) {
@@ -68,8 +68,6 @@ public class Flatscape implements KeyListener {
 				if(enemy.detectHit(bullet.position)) {
 					drawables.remove(bullet);
 					physicsAddition.put(bullet, false);
-					bullets.remove(bullet);
-					enemy.onHit();
 					continue loop;
 				}
 			}
@@ -81,7 +79,7 @@ public class Flatscape implements KeyListener {
 				}
 			}
 		}
-	}
+	}*/
 	
 	private static void keyboard() {
 		player.acceleration.x = player.acceleration.y = 0;
@@ -165,9 +163,12 @@ public class Flatscape implements KeyListener {
 		double scale = 1;
 		//int frames = 0;
 
-		// main animation loop		
+		EnemyShip blah = new EnemyShip(new WeaponBullet(), new Point(50, 50));
+		enemyAddition.put(blah, true);
+		
+		// main animation loop
 		while (!gameOver)  {			
-			StdDraw.picture(0, 0, "Background.png", 500, 500);
+			updateBackground();
 			keyboard();
 			if(stop) continue;			
 			removeEnemies();			
@@ -198,8 +199,7 @@ public class Flatscape implements KeyListener {
 			if(currentBulletDelay > 0) currentBulletDelay -= passed;
 			if(currentMeteorDelay > 0) currentMeteorDelay -= passed;
 			
-			hitDetect();
-			updateBackground();
+			//hitDetect();			
 			StdDraw.show(0);
 			/*if(System.currentTimeMillis() >= time + 1000) {
 				System.out.println(frames);
@@ -226,24 +226,51 @@ public class Flatscape implements KeyListener {
 	}
 	
 	public static void updateBackground() {
-		if(player.position.x > SCALE * .9) {			
-			for(Physicsable physics : Flatscape.physics) {
-				physics.position.x -= player.position.x - SCALE * .9;
+		double x = player.position.x;
+		double y = player.position.y;
+		
+		if(x > SCALE * .9) {			
+			for(Physicsable _physics : physics) {
+				_physics.position.x -= x - SCALE * .9;
 			}
+			bgOffset.x -= x - SCALE * .9;
 		} else if(player.position.x < -(SCALE * .9)) {			
-			for(Physicsable physics : Flatscape.physics) {
-				physics.position.x -= player.position.x + SCALE * .9;
+			for(Physicsable _physics : physics) {
+				_physics.position.x -= x + SCALE * .9;
 			}
+			bgOffset.x -= x + SCALE * .9;
 		}
 		
-		if(player.position.y > SCALE * .9) {			
-			for(Physicsable physics : Flatscape.physics) {
-				physics.position.y -= player.position.y - SCALE * .9;
+		if(y > SCALE * .9) {			
+			for(Physicsable _physics : physics) {
+				_physics.position.y -= y - SCALE * .9;
 			}
+			bgOffset.y -= y - SCALE * .9;
 		} else if(player.position.y < -(SCALE * .9)) {			
-			for(Physicsable physics : Flatscape.physics) {
-				physics.position.y -= player.position.y + SCALE * .9;
+			for(Physicsable _physics : physics) {
+				_physics.position.y -= y + SCALE * .9;
 			}
+			bgOffset.y -= y + SCALE * .9;
 		}
+		System.out.println(bgOffset);
+		
+		if(bgOffset.x >= 475) bgOffset.x -= 475;
+		if(bgOffset.x <= -475) bgOffset.x += 475;
+		if(bgOffset.y >= 475) bgOffset.y -= 475;
+		if(bgOffset.y <= -475) bgOffset.y += 475;
+		
+		StdDraw.picture(bgOffset.x, bgOffset.y, "Background.png", 500, 500);
+		
+		double _x = 0;
+		double _y = 0;
+				
+		if(bgOffset.x >= 140) _x = -345 - 130 - bgOffset.x;
+		if(bgOffset.x <= -140) _x = 345 + 130 + bgOffset.x;
+		if(bgOffset.y >= 140) _y = -345 - 130 - bgOffset.y;
+		if(bgOffset.y <= -140) _y = 345 + 130 + bgOffset.y;	
+		
+		if(_x != 0) StdDraw.picture(_x, bgOffset.y, "Background.png", 500, 500);
+		if(_y != 0) StdDraw.picture(bgOffset.x, _y, "Background.png", 500, 500);
+		if(_x != 0 && _y != 0) StdDraw.picture(_x, _y, "Background.png", 500, 500);
 	}
 } 

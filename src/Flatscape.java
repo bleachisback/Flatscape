@@ -149,10 +149,10 @@ public class Flatscape implements KeyListener {
 		double passed = 0;
 		double scale = 1;
 
-		Weapon[] weapons = new Weapon[1];
+		/*Weapon[] weapons = new Weapon[1];
 		weapons[0] = new WeaponBullet();
 		EnemyShip blah = new EnemyShip(weapons, new Point(50, 50));
-		enemyAddition.put(blah, true);
+		enemyAddition.put(blah, true);*/
 		
 		// main animation loop
 		while (!gameOver)  {			
@@ -244,11 +244,11 @@ public class Flatscape implements KeyListener {
 		double _x = 0;
 		double _y = 0;
 				
-		if(bgOffset.x >= 140) _x = -345 - 130 - bgOffset.x;
+		if(bgOffset.x >= 140) _x = -345 - 130 + bgOffset.x;
 		if(bgOffset.x <= -140) _x = 345 + 130 + bgOffset.x;
-		if(bgOffset.y >= 140) _y = -345 - 130 - bgOffset.y;
-		if(bgOffset.y <= -140) _y = 345 + 130 + bgOffset.y;	
-		
+		if(bgOffset.y >= 140) _y = -345 - 130 + bgOffset.y;
+		if(bgOffset.y <= -140) _y = 345 + 130 + bgOffset.y;
+				
 		if(_x != 0) StdDraw.picture(_x, bgOffset.y, "Background.png", 500, 500);
 		if(_y != 0) StdDraw.picture(bgOffset.x, _y, "Background.png", 500, 500);
 		if(_x != 0 && _y != 0) StdDraw.picture(_x, _y, "Background.png", 500, 500);

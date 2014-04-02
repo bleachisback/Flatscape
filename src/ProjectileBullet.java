@@ -7,22 +7,20 @@ public class ProjectileBullet extends Projectile {
 		this.velocity = velocity;
 		this.damage = damage;
 		this.source = source;
+		
+		Flatscape.drawables.add(this);
+		Flatscape.physicsAddition.put(this, true);
 	}
 	
 	@Override
-	public boolean detectHit(Point point) {
-		return point.distance(position) <= .9;
+	public boolean detectHit(Physicsable source) {
+		if(source == this.source.owner) return false;
+		return source.position.distance(position) <= .9;
 	}
 	
 	public void draw() {
 		StdDraw.setPenColor(StdDraw.YELLOW);
 		StdDraw.filledCircle(position.x, position.y, .9);
-	}
-
-	@Override
-	public void onHit(double damage, Physicsable source) {
-		Flatscape.drawables.remove(this);
-		Flatscape.physicsAddition.put(this, false);
 	}
 	
 	public void physics(double scale) {

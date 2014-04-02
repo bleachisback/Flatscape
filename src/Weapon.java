@@ -2,6 +2,7 @@
 public class Weapon {
 	public final int baseCooldown;
 	public int cooldown;
+	public Physicsable owner;
 	
 	public Weapon(int baseCooldown) {
 		this.baseCooldown = baseCooldown;

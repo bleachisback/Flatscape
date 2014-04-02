@@ -1,5 +1,5 @@
 
-public class Player extends Physicsable implements Drawable, Weaponable {
+public class Player extends Physicsable implements Drawable{
 	private Weapon[] weapons = new Weapon[4];
 	
 	public Player(Point position) {
@@ -8,13 +8,19 @@ public class Player extends Physicsable implements Drawable, Weaponable {
 		this.velocity = new Point(0, 0);
 		this.rotation = 0;
 		this.health = 30;
+		this.damage = 100;
 		
-		weapons[0] = new WeaponBullet();
+		weapons[0] = new WeaponBullet(this);
 	}
 	
 	@Override
-	public boolean detectHit(Point point) {
-		return point.distance(position) <= 10;
+	public boolean detectHit(Physicsable source) {
+		if(source instanceof Projectile) {
+			if(((Projectile) source).source.owner == this) {
+				return false;
+			}
+		}
+		return source.position.distance(position) <= 10;
 	}
 	
 	public void draw() {
@@ -31,10 +37,12 @@ public class Player extends Physicsable implements Drawable, Weaponable {
 	}
 	
 	@Override
-	public void onHit(double damage, Physicsable source) {
+	public void onHit(Physicsable source) {
 		if(hitBy.contains(source)) return;
-		this.health -= damage;
 		hitBy.add(source);
+		health -= source.damage;
+		
+		if(health <= 0) Flatscape.gameOver = true;
 	}
 	
 	public void physics(double scale) {
@@ -55,4 +63,6 @@ public class Player extends Physicsable implements Drawable, Weaponable {
 			}
 		}
 	}
+	
+	public void remove() {}
 }

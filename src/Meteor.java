@@ -9,7 +9,6 @@ public class Meteor extends Enemy {
 	public static final int POINTS = 5;
 	
 	public Color color;
-	public ArrayList<Physicsable> noHitList = new ArrayList<Physicsable>();
 	public Point[] points;
 	public double size;
 	
@@ -41,13 +40,14 @@ public class Meteor extends Enemy {
 		this.size = size;
 		this.rotation = rotation;
 		this.health = size / 1.5;
+		this.damage = size / 3;
 		
 		initialise();
 	}
 	
-	public boolean detectHit(Point point) {
-		if(FMath.hitboxCheck(new Point(position.x + size, position.y + size), new Point(position.x - size, position.y - size), point)) {
-			return FMath.insidePolygon(point, getRealPoints());
+	public boolean detectHit(Physicsable source) {
+		if(FMath.hitboxCheck(new Point(position.x + size, position.y + size), new Point(position.x - size, position.y - size), source.position)) {
+			return FMath.insidePolygon(source.position, getRealPoints());
 		}
 		return false;
 	}
@@ -143,12 +143,18 @@ public class Meteor extends Enemy {
 		rotate(rotation * scale);
 	}
 	
-	public void onHit(double damage, Physicsable source) {
-		if(noHitList.contains(source)) return;
+	public void onHit(Physicsable source) {
+		if(hitBy.contains(source)) return;
+		hitBy.add(source);
+		health -= source.damage;
 		
+		if(source instanceof Meteor) health -= source.damage * 3;
+		if(health >= 1) return;
+				
 		FMath.playSound("Meteor_Destroy0");
 		remove();
 		if(size < 18) return;
+		
 		ArrayList<Meteor> meteors = new ArrayList<Meteor>();
 		for (int i = 0; i < 4; i++) {
 			Point newPos = randomRelativePos();
@@ -160,7 +166,7 @@ public class Meteor extends Enemy {
 		for(Meteor _meteor : meteors) {
 			for(Meteor $meteor : meteors) {
 				if(_meteor == $meteor) continue;
-				_meteor.noHitList.add($meteor);
+				_meteor.hitBy.add($meteor);
 			}
 		}
 	}

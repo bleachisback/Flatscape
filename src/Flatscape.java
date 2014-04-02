@@ -56,30 +56,17 @@ public class Flatscape implements KeyListener {
 		keySequenceRunnable.put(keys, runnable);
 	}
 	
-	/*@SuppressWarnings("unchecked")
 	public static void hitDetect() {
-		loop: for(Enemy enemy : enemies) {
-			if(enemy.detectHit(player.position)) {
-				gameOver = true;
-				FMath.playSound("Game_Over");
-				return;
-			}
-			for(ProjectileBullet bullet : (ArrayList<ProjectileBullet>) bullets.clone()) {
-				if(enemy.detectHit(bullet.position)) {
-					drawables.remove(bullet);
-					physicsAddition.put(bullet, false);
-					continue loop;
-				}
-			}
-			for(Enemy _enemy : enemies) {
-				if(enemy != _enemy && enemy instanceof Meteor && _enemy instanceof MeteorHitable) {
-					if(enemy.detectHit(_enemy.position)) {
-						_enemy.onMeteorHit((Meteor) enemy);
-					}
+		for(Physicsable phys : physics) {
+			for(Physicsable _phys : physics) {
+				if(phys == _phys) continue;
+				if(phys.detectHit(_phys)) {
+					phys.onHit(_phys);
+					_phys.onHit(phys);
 				}
 			}
 		}
-	}*/
+	}
 	
 	private static void keyboard() {
 		player.acceleration.x = player.acceleration.y = 0;
@@ -161,9 +148,11 @@ public class Flatscape implements KeyListener {
 		long time = System.currentTimeMillis();
 		double passed = 0;
 		double scale = 1;
-		//int frames = 0;
 
-		EnemyShip blah = new EnemyShip(new WeaponBullet(), new Point(50, 50));
+		Weapon[] weapons = new Weapon[1];
+		EnemyShip blah = null;		
+		weapons[0] = new WeaponBullet(blah);
+		blah = new EnemyShip(weapons, new Point(50, 50));
 		enemyAddition.put(blah, true);
 		
 		// main animation loop
@@ -199,7 +188,7 @@ public class Flatscape implements KeyListener {
 			if(currentBulletDelay > 0) currentBulletDelay -= passed;
 			if(currentMeteorDelay > 0) currentMeteorDelay -= passed;
 			
-			//hitDetect();			
+			hitDetect();			
 			StdDraw.show(0);
 			/*if(System.currentTimeMillis() >= time + 1000) {
 				System.out.println(frames);
@@ -252,7 +241,6 @@ public class Flatscape implements KeyListener {
 			}
 			bgOffset.y -= y + SCALE * .9;
 		}
-		System.out.println(bgOffset);
 		
 		if(bgOffset.x >= 475) bgOffset.x -= 475;
 		if(bgOffset.x <= -475) bgOffset.x += 475;

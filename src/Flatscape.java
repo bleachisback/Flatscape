@@ -257,11 +257,11 @@ public class Flatscape implements KeyListener {
 		
 		double _x = 0;
 		double _y = 0;
-				
-		if(bgOffset.x >= 150) _x = -500 + bgOffset.x - 1;
-		if(bgOffset.x <= -150) _x = 500 + bgOffset.x - 10.5;
-		if(bgOffset.y >= 150) _y = -500 + bgOffset.y + 2;
-		if(bgOffset.y <= -150) _y = 500 + bgOffset.y - 1;
+		
+		if(bgOffset.x >= 150) _x = -500 + bgOffset.x;
+		if(bgOffset.x <= -150) _x = 500 + bgOffset.x;
+		if(bgOffset.y >= 150) _y = -500 + bgOffset.y;
+		if(bgOffset.y <= -150) _y = 500 + bgOffset.y;
 				
 		if(_x != 0) StdDraw.picture(_x, bgOffset.y, "Background.png", 500, 500);
 		if(_y != 0) StdDraw.picture(bgOffset.x, _y, "Background.png", 500, 500);

@@ -43,6 +43,12 @@ public class Point {
 		return false;
 	}
 	
+	public Point multiply(double multiple) {
+		x *= multiple;
+		y *= multiple;
+		return this;
+	}
+	
 	public Point subtract(Point point) {
 		x -= point.x;
 		y -= point.y;

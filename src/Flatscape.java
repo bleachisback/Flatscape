@@ -149,9 +149,12 @@ public class Flatscape implements KeyListener {
 		
 		// main animation loop
 		while (!gameOver)  {			
-			updateBackground();
 			keyboard();
-			if(stop) continue;			
+			if(stop) {
+				time = System.currentTimeMillis();
+				continue;	
+			}
+			updateBackground();
 			removeEnemies();
 
 			passed = System.currentTimeMillis() - time;

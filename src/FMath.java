@@ -119,6 +119,10 @@ public class FMath {
 		return point;
 	}
 	
+	public static Point smallerHypot(Point point1, Point point2, double targetHypot) {
+		return smallerHypot(point1.x - point2.x, point1.y - point2.y, targetHypot);
+	}
+	
 	public static Point smallerHypot(double adj, double opp, double targetHypot) {
 		double angle = Math.atan(opp / adj);
 		double negative = 1;

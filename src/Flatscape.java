@@ -1,5 +1,9 @@
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -147,6 +151,12 @@ public class Flatscape implements KeyListener {
 		double passed = 0;
 		double scale = 1;
 		
+		try {
+			StdDraw.setFont(Font.createFont(Font.TRUETYPE_FONT, Flatscape.class.getResourceAsStream("Digital_tech.ttf")).deriveFont(50.0f));			
+		} catch (FontFormatException | IOException e) {
+			e.printStackTrace();
+		}
+		
 		// main animation loop
 		while (!gameOver)  {			
 			keyboard();
@@ -156,11 +166,13 @@ public class Flatscape implements KeyListener {
 			}
 			updateBackground();
 			removeEnemies();
+			
+			StdDraw.textLeft(0, 0, "blah blah");
 
 			passed = System.currentTimeMillis() - time;
 			time = System.currentTimeMillis();
 			scale = passed / 10;
-					
+			
 			if(currentEnemyDelay <= 0) {
 				currentEnemyDelay = ENEMY_DELAY + currentEnemyDelay;
 				if(Math.random() > .25) {

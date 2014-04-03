@@ -11,6 +11,7 @@ public class Player extends Physicsable implements Drawable{
 		this.damage = 100;
 		
 		weapons[0] = new WeaponRocket(750);
+		weapons[1] = new WeaponBullet(300);
 	}
 	
 	@Override

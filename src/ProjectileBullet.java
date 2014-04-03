@@ -15,6 +15,9 @@ public class ProjectileBullet extends Projectile {
 	@Override
 	public boolean detectHit(Physicsable source) {
 		if(source == this.source.owner) return false;
+		if(source instanceof Projectile) {
+			if(((Projectile) source).source.owner == this.source.owner) return false;
+		}
 		return source.position.distance(position) <= .9;
 	}
 	

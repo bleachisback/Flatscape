@@ -209,44 +209,47 @@ public class Flatscape implements KeyListener {
 		double x = player.position.x;
 		double y = player.position.y;
 		
-		if(x > SCALE * .9) {			
+		double limit = .5;
+		
+		if(x > SCALE * limit) {			
 			for(Physicsable _physics : physics) {
-				_physics.position.x -= x - SCALE * .9;
+				_physics.position.x -= x - SCALE * limit;
 			}
-			bgOffset.x -= x - SCALE * .9;
-		} else if(player.position.x < -(SCALE * .9)) {			
+			bgOffset.x -= x - SCALE * limit;
+		} else if(player.position.x < -(SCALE * limit)) {			
 			for(Physicsable _physics : physics) {
-				_physics.position.x -= x + SCALE * .9;
+				_physics.position.x -= x + SCALE * limit;
 			}
-			bgOffset.x -= x + SCALE * .9;
+			bgOffset.x -= x + SCALE * limit;
 		}
 		
-		if(y > SCALE * .9) {			
+		if(y > SCALE * limit) {
 			for(Physicsable _physics : physics) {
-				_physics.position.y -= y - SCALE * .9;
+				_physics.position.y -= y - SCALE * limit;
 			}
-			bgOffset.y -= y - SCALE * .9;
-		} else if(player.position.y < -(SCALE * .9)) {			
+			bgOffset.y -= y - SCALE * limit;
+		} else if(player.position.y < -(SCALE * limit)) {			
 			for(Physicsable _physics : physics) {
-				_physics.position.y -= y + SCALE * .9;
+				_physics.position.y -= y + SCALE * limit;
 			}
-			bgOffset.y -= y + SCALE * .9;
+			bgOffset.y -= y + SCALE * limit;
 		}
 		
-		if(bgOffset.x >= 475) bgOffset.x -= 475;
-		if(bgOffset.x <= -475) bgOffset.x += 475;
-		if(bgOffset.y >= 475) bgOffset.y -= 475;
-		if(bgOffset.y <= -475) bgOffset.y += 475;
+		double reset = 500;
+		if(bgOffset.x >= reset) bgOffset.x -= reset;
+		if(bgOffset.x <= -reset) bgOffset.x += reset;
+		if(bgOffset.y >= reset) bgOffset.y -= reset;
+		if(bgOffset.y <= -reset) bgOffset.y += reset;
 		
 		StdDraw.picture(bgOffset.x, bgOffset.y, "Background.png", 500, 500);
 		
 		double _x = 0;
 		double _y = 0;
 				
-		if(bgOffset.x >= 140) _x = -345 - 130 + bgOffset.x;
-		if(bgOffset.x <= -140) _x = 345 + 130 + bgOffset.x;
-		if(bgOffset.y >= 140) _y = -345 - 130 + bgOffset.y;
-		if(bgOffset.y <= -140) _y = 345 + 130 + bgOffset.y;
+		if(bgOffset.x >= 150) _x = -500 + bgOffset.x - 1;
+		if(bgOffset.x <= -150) _x = 500 + bgOffset.x - 10.5;
+		if(bgOffset.y >= 150) _y = -500 + bgOffset.y + 2;
+		if(bgOffset.y <= -150) _y = 500 + bgOffset.y - 1;
 				
 		if(_x != 0) StdDraw.picture(_x, bgOffset.y, "Background.png", 500, 500);
 		if(_y != 0) StdDraw.picture(bgOffset.x, _y, "Background.png", 500, 500);

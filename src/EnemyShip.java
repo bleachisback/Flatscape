@@ -93,7 +93,7 @@ public class EnemyShip extends Enemy {
 	
 	public static Weapon[] randomWeapon() {
 		Weapon[] weapons = new Weapon[1];
-		weapons[0] = new WeaponBullet(600);
+		weapons[0] = Math.random() > .5 ? new WeaponRocket(800) : new WeaponBullet(600);
 		return weapons;
 	}
 

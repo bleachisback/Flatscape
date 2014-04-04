@@ -7,7 +7,7 @@ public class Player extends Physicsable implements Drawable{
 		this.position = position;
 		this.velocity = new Point(0, 0);
 		this.rotation = 0;
-		this.health = 75;
+		this.health = 100;
 		this.damage = 100;
 		
 		weapons[0] = new WeaponRocket(750);

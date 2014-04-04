@@ -2,7 +2,6 @@ import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -225,11 +224,13 @@ public class Flatscape implements KeyListener {
 		
 		if(x > SCALE * limit) {			
 			for(Physicsable _physics : physics) {
+				if(_physics instanceof Projectile) continue;
 				_physics.position.x -= x - SCALE * limit;
 			}
 			bgOffset.x -= x - SCALE * limit;
 		} else if(player.position.x < -(SCALE * limit)) {			
 			for(Physicsable _physics : physics) {
+				if(_physics instanceof Projectile) continue;
 				_physics.position.x -= x + SCALE * limit;
 			}
 			bgOffset.x -= x + SCALE * limit;
@@ -237,11 +238,13 @@ public class Flatscape implements KeyListener {
 		
 		if(y > SCALE * limit) {
 			for(Physicsable _physics : physics) {
+				if(_physics instanceof Projectile) continue;
 				_physics.position.y -= y - SCALE * limit;
 			}
 			bgOffset.y -= y - SCALE * limit;
 		} else if(player.position.y < -(SCALE * limit)) {			
 			for(Physicsable _physics : physics) {
+				if(_physics instanceof Projectile) continue;
 				_physics.position.y -= y + SCALE * limit;
 			}
 			bgOffset.y -= y + SCALE * limit;

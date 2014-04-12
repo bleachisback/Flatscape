@@ -18,7 +18,7 @@ public class EnemyShip extends Enemy {
 		this.acceleration = new Point(0, 0);
 		this.rotation = 0;
 		this.damage = 100;
-		this.hasShield = (Flatscape.level > 3 || Flatscape.level == 0) && Math.random() > .5;
+		this.hasShield = (Flatscape.level > 2 || Flatscape.level == 0) && Math.random() > .5;
 		if(hasShield) shield = 10;
 		target = findTarget();
 	}

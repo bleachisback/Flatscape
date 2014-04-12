@@ -51,15 +51,19 @@ public class Player extends Physicsable implements Drawable{
 		Flatscape.drawables.add(this);
 		Flatscape.physics.add(this);
 		Flatscape.cameraTarget = this;
+		System.out.println(Flatscape.level);
 		switch(Flatscape.level) {
 			case 2:
-				weapons[1] = new WeaponRocket(750);
+				weapons[0] = new WeaponBullet(150);
 				break;
 			case 3:
+				weapons[1] = new WeaponRocket(750);
+				break;
+			case 4:
 				hasShield = true;
 				shield = 10;
 				break;
-			case 4:
+			case 5:
 				break;
 		}
 	}

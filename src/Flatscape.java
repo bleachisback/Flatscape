@@ -58,13 +58,16 @@ public class Flatscape implements KeyListener, MouseListener {
 	public static long time = System.currentTimeMillis();
 	public static double passed = 0;
 	public static double scale = 1;
+	public static long textTime;
 	
 	public static Physicsable cameraTarget = null;
 	
-	public static final int TELEPORT_DELAY = 6000;
+	public static final int TELEPORT_DELAY = 60000;
 	public static double currentTeleport;
 	
 	public static String killedBy = "";
+	
+	public static final String[] levelNames = {"Star Citizen", "Faster Than Light", "Starbound", "Mass Effect"};
 	
 	public static void main(String[] args) {
 		JFrame frame = null;
@@ -294,6 +297,14 @@ public class Flatscape implements KeyListener, MouseListener {
 			return;	
 		}		
 		
+		if(System.currentTimeMillis() <= textTime + 5000) {
+			StdDraw.setPenColor(StdDraw.WHITE);
+			StdDraw.setFont(titleFont.deriveFont(60.0f));
+			StdDraw.text(0, 50, levelNames[level]);
+			StdDraw.setFont(subTitleFont);
+			StdDraw.text(0, 35, "Level " + level);
+		}
+		
 		time();
 		handleEnemies();
 		physics();
@@ -478,6 +489,7 @@ public class Flatscape implements KeyListener, MouseListener {
 			else {
 				gameState = GameState.GAME;
 				scanner.close();
+				textTime = System.currentTimeMillis();
 			}
 			nextText = false;
 		}

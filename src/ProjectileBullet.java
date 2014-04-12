@@ -18,6 +18,7 @@ public class ProjectileBullet extends Projectile {
 		if(source instanceof Projectile) {
 			if(((Projectile) source).source.owner == this.source.owner) return false;
 		}
+		if(source == null) return false;
 		return source.position.distance(position) <= .9;
 	}
 	
@@ -32,6 +33,10 @@ public class ProjectileBullet extends Projectile {
 			Flatscape.drawables.remove(this);
 			Flatscape.physicsAddition.put(this, false);
 		}
+	}
+	
+	public String toString() {
+		return "Machine gun bullet";
 	}
 
 }

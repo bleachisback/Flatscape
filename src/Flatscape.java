@@ -9,6 +9,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
 
@@ -59,8 +61,10 @@ public class Flatscape implements KeyListener, MouseListener {
 	
 	public static Physicsable cameraTarget = null;
 	
-	public static final int TELEPORT_DELAY = 60000;
+	public static final int TELEPORT_DELAY = 6000;
 	public static double currentTeleport;
+	
+	public static String killedBy = "";
 	
 	public static void main(String[] args) {
 		JFrame frame = null;
@@ -95,15 +99,31 @@ public class Flatscape implements KeyListener, MouseListener {
 		keySequenceRunnable.put(keys, runnable);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static void draw() {
-		for(Drawable draw : drawables) {
+		for(Drawable draw : (ArrayList<Drawable>) drawables.clone()) {
 			draw.draw();
 		}
 		int teleportStage = (int) Math.floor(currentTeleport / TELEPORT_DELAY * 15);
-		//System.out.println(currentTeleport + " " + TELEPORT_DELAY + " " + (currentTeleport / TELEPORT_DELAY) + " "+ teleportStage);
 		if(gameState != GameState.START_MENU) StdDraw.picture(0, 95, "UI/" + teleportStage + ".png");
 		StdDraw.show(0);
 		updateBackground();
+	}
+	
+	public static void gameOver() {
+		gameState = GameState.END;
+		FMath.playMusic("GameOver");
+		
+		StdDraw.setPenColor(StdDraw.WHITE);
+		StdDraw.setFont(titleFont);
+		StdDraw.text(0, 50, "Game Over");
+		StdDraw.setFont(subTitleFont);
+		StdDraw.text(0, 35, "Killed by " + killedBy);
+		StdDraw.setFont(storyFont);
+		StdDraw.text(0, -90, "Click to restart");
+		
+		draw();
+		time();
 	}
 	
 	private static void gameState() {
@@ -115,8 +135,10 @@ public class Flatscape implements KeyListener, MouseListener {
 				playGame();
 				break;
 			case PAUSE:
+				pause();
 				break;
 			case END:
+				gameOver();
 				break;
 			case TEXT:
 				writeText();
@@ -183,7 +205,6 @@ public class Flatscape implements KeyListener, MouseListener {
 			if(Flatscape.currentTeleport >= Flatscape.TELEPORT_DELAY) {
 				Flatscape.nextLevel();
 			}
-			//pause = !pause;
 		}
 		for(int[] keys : keySequenceProgress.keySet()) {
 			int progress = keySequenceProgress.get(keys);
@@ -216,6 +237,9 @@ public class Flatscape implements KeyListener, MouseListener {
 				break;
 			case TEXT:
 				Flatscape.nextText = true;
+				break;
+			case END:
+				restartGame();
 				break;
 			default:
 				break;
@@ -250,6 +274,10 @@ public class Flatscape implements KeyListener, MouseListener {
 		scale = 1;
 		
 		startText(level);
+	}
+	
+	public static void pause() {
+		draw();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -295,6 +323,16 @@ public class Flatscape implements KeyListener, MouseListener {
 		enemyAddition.clear();
 	}
 	
+	public static void restartGame() {
+		gameState = GameState.START_MENU;
+		
+		enemies.clear();
+		physics.clear();
+		drawables.clear();
+		
+		
+	}
+	
 	public static void startGame() {
 		enemies.clear();
 		physics.clear();
@@ -312,6 +350,19 @@ public class Flatscape implements KeyListener, MouseListener {
 		scale = 1;
 		
 		startText(0);
+	}
+	
+	public static void startGameOver(final Physicsable source) {
+		gameState = GameState.PAUSE;
+		FMath.playMusic("Lose");
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			public void run() {
+				Flatscape.gameOver();
+			}
+		}, 10000);
+		
+		killedBy = source.toString();
 	}
 	
 	@SuppressWarnings("unchecked")

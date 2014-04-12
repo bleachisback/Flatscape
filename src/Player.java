@@ -75,7 +75,7 @@ public class Player extends Physicsable implements Drawable{
 		}
 		health -= source.damage;
 		
-		if(health <= 0) Flatscape.gameState = GameState.END;
+		if(health <= 0) Flatscape.startGameOver(source);
 	}
 	
 	public void physics(double scale) {
@@ -104,4 +104,8 @@ public class Player extends Physicsable implements Drawable{
 	}
 	
 	public void remove() {}
+	
+	public String toString() {
+		return "The player";
+	}
 }

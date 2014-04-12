@@ -88,4 +88,8 @@ public class ProjectileRocket extends Projectile {
 		}
 	}
 	
+	public String toString() {
+		return "Homing Rocket";
+	}
+	
 }

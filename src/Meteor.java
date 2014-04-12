@@ -40,7 +40,7 @@ public class Meteor extends Enemy {
 		this.size = size;
 		this.rotation = rotation;
 		this.health = size / 1.5;
-		this.damage = size / 3;
+		this.damage = size;
 		
 		initialise();
 	}
@@ -172,6 +172,6 @@ public class Meteor extends Enemy {
 	}
 	
 	public String toString() {
-		return FMath.getColorString(color) + "Meteor " + size + " large.";
+		return FMath.getColorString(color) + " Meteor " + Math.round(size) + " large.";
 	}
 }

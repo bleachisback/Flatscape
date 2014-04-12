@@ -135,5 +135,9 @@ public class EnemyShip extends Enemy {
 		weapons[0] = Math.random() > .5  && Flatscape.level != 1 ? new WeaponRocket(800) : new WeaponBullet(600);
 		return weapons;
 	}
+	
+	public String toString() {
+		return "Enemy Ship";
+	}
 
 }

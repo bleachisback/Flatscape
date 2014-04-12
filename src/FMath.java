@@ -92,6 +92,7 @@ public class FMath {
 			if(clip == null) return;
 			clip.stop();
 		} else {
+			if(clip != null) clip.stop();
 			try {
 				clip = AudioSystem.getClip();
 				InputStream stream = FMath.class.getResourceAsStream(SOUND_PATH + url + ".wav");

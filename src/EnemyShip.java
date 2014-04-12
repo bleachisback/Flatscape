@@ -58,8 +58,14 @@ public class EnemyShip extends Enemy {
 	public void onHit(Physicsable source) {
 		if(hitBy.contains(source)) return;
 		hitBy.add(source);
-		health -= source.damage;
 		
+		if(shield > 0) {
+			shield = 0;
+			shieldCooldown = SHIELD_COOLDOWN;
+			return;
+		}
+		
+		health -= source.damage;
 		if(health <= 0) {
 			FMath.playSound("Meteor_Destroy0");
 			remove();
@@ -116,6 +122,11 @@ public class EnemyShip extends Enemy {
 			if(weapon.cooldown <= 0) {
 				weapon.shoot(this);
 			}
+		}
+		
+		if(shieldCooldown > 0) shieldCooldown -= scale * 10;
+		if(shieldCooldown <= 0) {
+			shield = 10;
 		}
 	}
 	

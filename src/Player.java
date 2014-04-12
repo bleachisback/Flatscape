@@ -71,6 +71,7 @@ public class Player extends Physicsable implements Drawable{
 		if(shield > 0) {
 			shield = 0;
 			shieldCooldown = SHIELD_COOLDOWN;
+			return;
 		}
 		health -= source.damage;
 		

@@ -83,6 +83,31 @@ public class FMath {
 	    return val == 0.0 ? 0 : val > 0.0 ? 1 : 2;
 	}
 	
+	private static String currentSong = "";
+	private static Clip clip = null;
+	public static synchronized void playMusic(final String url) {
+		if(url.equals(currentSong)) {
+			return;
+		} else if(url.equals("")) {
+			if(clip == null) return;
+			clip.stop();
+		} else {
+			try {
+				clip = AudioSystem.getClip();
+				InputStream stream = FMath.class.getResourceAsStream(SOUND_PATH + url + ".wav");
+				InputStream bufferedStream = new BufferedInputStream(stream);
+				AudioInputStream inputStream = AudioSystem.getAudioInputStream(bufferedStream);
+				clip.open(inputStream);
+				clip.start();
+				clip.loop(-1);
+				currentSong = url;
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public static synchronized void playSound(final String url) {
 		try {
 			Clip clip = AudioSystem.getClip();
@@ -90,7 +115,7 @@ public class FMath {
 			InputStream bufferedStream = new BufferedInputStream(stream);
 			AudioInputStream inputStream = AudioSystem.getAudioInputStream(bufferedStream);
 			clip.open(inputStream);
-			clip.start();
+			clip.start();			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -61,6 +61,8 @@ public class Meteor extends Enemy {
 	}
 	
 	public void draw() {
+		super.draw();
+		
 		StdDraw.setPenColor(color);
 		double[] pointsX = new double[Meteor.POINTS];
 		double[] pointsY = new double[Meteor.POINTS];

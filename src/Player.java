@@ -10,8 +10,7 @@ public class Player extends Physicsable implements Drawable{
 		this.health = 100;
 		this.damage = 100;
 		
-		weapons[0] = new WeaponRocket(750);
-		weapons[1] = new WeaponBullet(300);
+		weapons[0] = new WeaponBullet(300);
 	}
 	
 	@Override
@@ -21,10 +20,12 @@ public class Player extends Physicsable implements Drawable{
 				return false;
 			}
 		}
-		return source.position.distance(position) <= 10;
+		return source.position.distance(position) < shield ? true : source.position.distance(position) < 6;
 	}
 	
 	public void draw() {
+		super.draw();
+		
 		//Draw player ship
 		StdDraw.picture(position.x, position.y, "Player.png", 10, 10, -rotation);
 		
@@ -34,16 +35,46 @@ public class Player extends Physicsable implements Drawable{
 	}
 	
 	public Weapon[] getWeapons() {		
-		return weapons;		
+		return weapons;
+	}
+	
+	public void nextLevel() {
+		position.x = 0;
+		position.y = 0;
+		velocity.x = 0;
+		velocity.y = 0;
+		acceleration.x = 0;
+		acceleration.y = 0;
+		
+		health = 100;
+		
+		Flatscape.drawables.add(this);
+		Flatscape.physics.add(this);
+		Flatscape.cameraTarget = this;
+		switch(Flatscape.level) {
+			case 2:
+				weapons[1] = new WeaponRocket(750);
+				break;
+			case 3:
+				hasShield = true;
+				shield = 10;
+				break;
+			case 4:
+				break;
+		}
 	}
 	
 	@Override
 	public void onHit(Physicsable source) {
 		if(hitBy.contains(source)) return;
 		hitBy.add(source);
+		if(shield > 0) {
+			shield = 0;
+			shieldCooldown = SHIELD_COOLDOWN;
+		}
 		health -= source.damage;
 		
-		if(health <= 0) Flatscape.gameOver = true;
+		if(health <= 0) Flatscape.gameState = GameState.END;
 	}
 	
 	public void physics(double scale) {
@@ -56,12 +87,18 @@ public class Player extends Physicsable implements Drawable{
 		
 		if(Double.isNaN(rotation)) rotation = 0;
 		
+		if(Flatscape.gameState != GameState.GAME) return;
 		for(Weapon weapon : weapons) {
 			if(weapon == null) continue;
 			weapon.physics(scale);
 			if(weapon.cooldown <= 0 && StdDraw.mousePressed()) {
 				weapon.shoot(this);
 			}
+		}
+		
+		if(shieldCooldown > 0) shieldCooldown -= scale * 10;
+		if(shieldCooldown <= 0) {
+			shield = 10;
 		}
 	}
 	

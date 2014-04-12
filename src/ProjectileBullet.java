@@ -28,10 +28,10 @@ public class ProjectileBullet extends Projectile {
 	
 	public void physics(double scale) {
 		super.physics(scale);
-		if (Math.abs(position.x) >= 107.5 || Math.abs(position.y) >= 107.5) { 
+		if (distance >= 300) { 
 			Flatscape.drawables.remove(this);
 			Flatscape.physicsAddition.put(this, false);
-		}		
+		}
 	}
 
 }

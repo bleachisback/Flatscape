@@ -1,6 +1,7 @@
 
 public class EnemyShip extends Enemy {
 	public double health = 20;
+	public Physicsable target;
 	
 	public EnemyShip() {
 		this(randomWeapon());
@@ -16,6 +17,8 @@ public class EnemyShip extends Enemy {
 		this.velocity = new Point(0, 0);
 		this.acceleration = new Point(0, 0);
 		this.rotation = 0;
+		this.damage = 100;
+		target = findTarget();
 	}
 
 	@Override
@@ -25,12 +28,28 @@ public class EnemyShip extends Enemy {
 				return false;
 			}
 		}
-		return source.position.distance(position) < 10 ;
+		return source.position.distance(position) < shield ? true : source.position.distance(position) < 6;
 	}
 	
 	@Override
 	public void draw() {
+		super.draw();
+		
 		StdDraw.picture(position.x, position.y, "Enemy.png", 10, 10, -rotation);		
+	}
+	
+	public Physicsable findTarget() {		
+		if(Flatscape.gameState != GameState.START_MENU) return Flatscape.player;
+		if(Flatscape.enemies.isEmpty()) return null;
+		Enemy _target = Flatscape.enemies.get(0);
+		if(_target == this) {
+			if(Flatscape.enemies.toArray().length > 1) {
+				return Flatscape.enemies.get(1);
+			} else {
+				return null;
+			}
+		}
+		return  _target;
 	}
 
 	@Override
@@ -49,17 +68,24 @@ public class EnemyShip extends Enemy {
 	public void physics(double scale) {
 		super.physics(scale);
 		
-		rotation = Math.toDegrees(Math.atan((Flatscape.player.position.y - position.y)/(Flatscape.player.position.x - position.x))) - 90;
-		if (Flatscape.player.position.x < position.x) rotation -= 180;
+		if(!Flatscape.enemies.contains(target) || target == null) {
+			target = findTarget();
+		}
+		if(target == null) {
+			acceleration = new Point(0, 0);
+			return;
+		}	
+		rotation = Math.toDegrees(Math.atan((target.position.y - position.y) / (target.position.x - position.x))) - 90;
+		if (target.position.x < position.x) rotation -= 180;
 		rotation *= -1;
 		
 		if(Double.isNaN(rotation)) rotation = 0;
 		
 		acceleration.x = acceleration.y = 0;
-		Point point = FMath.smallerHypot(Flatscape.player.position.x - position.x, Flatscape.player.position.y - position.y, Flatscape.SHIP_SPEED / 2);		
-		if(position.distance(Flatscape.player.position) >= 75) {
+		Point point = FMath.smallerHypot(target.position.x - position.x, target.position.y - position.y, Flatscape.SHIP_SPEED / 2);		
+		if(position.distance(target.position) >= 75) {
 			acceleration.add(point);
-		} else if(position.distance(Flatscape.player.position) <= 50) {
+		} else if(position.distance(target.position) <= 50) {
 			acceleration.subtract(point);
 			acceleration.subtract(point);
 		} else {

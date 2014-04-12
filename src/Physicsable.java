@@ -8,14 +8,25 @@ public abstract class Physicsable {
 	
 	public double rotation;
 	
+	public static final int SHIELD_COOLDOWN = 5000;
+	
 	public double damage;
 	public double health;
+	public boolean hasShield = false;
+	public double shield = 0;
+	public int shieldCooldown = 0;
 	public ArrayList<Physicsable> hitBy = new ArrayList<Physicsable>();
 	
 	public Weapon[] weapons;
 	
 	public abstract boolean detectHit(Physicsable source);
 	
+	public void draw() {
+		if(!hasShield) return;
+		//Drawing shield
+		StdDraw.setPenColor(StdDraw.BOOK_LIGHT_BLUE);
+		StdDraw.circle(position.x, position.y, shield);
+	}
 	
 	public abstract void onHit(Physicsable source);
 	

@@ -12,7 +12,8 @@ public class WeaponRocket extends Weapon {
 	public void shoot(Physicsable shooter) {		
 		super.shoot(shooter);
 		//FMath.playSound("Laser_Shoot0");
-		new ProjectileRocket(shooter.position.clone(), FMath.circlePoint(ROCKET_SPEED / 10, shooter.rotation), DAMAGE, this);
+		ProjectileRocket rocket = new ProjectileRocket(shooter.position.clone(), FMath.circlePoint(ROCKET_SPEED / 10, shooter.rotation), DAMAGE, this);
+		if(rocket.target == null) rocket.remove();
 	}
 
 }

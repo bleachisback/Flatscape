@@ -71,7 +71,7 @@ public class ProjectileRocket extends Projectile {
 	
 	public void physics(double scale) {
 		super.physics(scale);		
-		if (Math.abs(position.x) >= 507.5 || Math.abs(position.y) >= 507.5) { 
+		if (position.distance(source.owner.position) >= 200 || distance >= 300) { 
 			Flatscape.drawables.remove(this);
 			Flatscape.physicsAddition.put(this, false);
 			return;

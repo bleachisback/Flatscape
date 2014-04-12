@@ -18,6 +18,8 @@ public class EnemyShip extends Enemy {
 		this.acceleration = new Point(0, 0);
 		this.rotation = 0;
 		this.damage = 100;
+		this.hasShield = (Flatscape.level > 3 || Flatscape.level == 0) && Math.random() > .5;
+		if(hasShield) shield = 10;
 		target = findTarget();
 	}
 
@@ -119,7 +121,7 @@ public class EnemyShip extends Enemy {
 	
 	public static Weapon[] randomWeapon() {
 		Weapon[] weapons = new Weapon[1];
-		weapons[0] = Math.random() > .5 ? new WeaponRocket(800) : new WeaponBullet(600);
+		weapons[0] = Math.random() > .5  && Flatscape.level != 1 ? new WeaponRocket(800) : new WeaponBullet(600);
 		return weapons;
 	}
 
